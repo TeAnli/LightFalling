@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "lightfalling",
+  "version": "${version}",
+  "name": "LightFalling",
+  "description": "a simple and versatile Minecraft tool for AFK, PVP and PVE",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/lightfalling/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "top.teanli.lightfalling.client.LightfallingDataGenerator"
+    ],
+    "client": [
+      "top.teanli.lightfalling.client.LightfallingClient"
+    ],
+    "main": [
+      "top.teanli.lightfalling.Lightfalling"
+    ]
+  },
+  "mixins": [
+    "lightfalling.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
