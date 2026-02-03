@@ -8,6 +8,7 @@ import net.minecraft.util.Formatting
 import org.apache.logging.log4j.LogManager
 import top.teanli.lightfalling.tool.MessageTool
 import top.teanli.lightfalling.tool.PackageScanner
+import top.teanli.lightfalling.command.execute
 
 /**
  * Command Manager

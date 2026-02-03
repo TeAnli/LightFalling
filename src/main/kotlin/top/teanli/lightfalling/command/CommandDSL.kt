@@ -1,5 +1,6 @@
 package top.teanli.lightfalling.command
 
+import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -24,34 +25,34 @@ fun <S : ArgumentBuilder<FabricClientCommandSource, S>> S.literal(
     return then(builder)
 }
 
-fun <S : ArgumentBuilder<FabricClientCommandSource, S>> S.argument(
+fun <S : ArgumentBuilder<FabricClientCommandSource, S>, T : Any> S.argument(
     name: String,
-    type: StringArgumentType?,
-    block: RequiredArgumentBuilder<FabricClientCommandSource, *>.() -> Unit = {}
+    type: ArgumentType<T>,
+    block: RequiredArgumentBuilder<FabricClientCommandSource, T>.() -> Unit = {}
 ): S {
-    val builder = ClientCommandManager.argument(name, type)
+    val builder: RequiredArgumentBuilder<FabricClientCommandSource, T> = ClientCommandManager.argument(name, type)
     builder.block()
     return then(builder)
 }
 
-fun ArgumentBuilder<FabricClientCommandSource, *>.execute(
+fun <S : ArgumentBuilder<FabricClientCommandSource, S>> S.execute(
     block: (CommandContext<FabricClientCommandSource>) -> Int
-): ArgumentBuilder<FabricClientCommandSource, *> {
+): S {
     return executes { block(it) }
 }
 
-fun RequiredArgumentBuilder<FabricClientCommandSource, *>.suggest(
+fun <T : Any> RequiredArgumentBuilder<FabricClientCommandSource, T>.suggest(
     block: (CommandContext<FabricClientCommandSource>, SuggestionsBuilder) -> CompletableFuture<Suggestions>
-): RequiredArgumentBuilder<FabricClientCommandSource, *> {
+): RequiredArgumentBuilder<FabricClientCommandSource, T> {
     return suggests(block)
 }
 
 /**
  * Simple suggestion helper for a list of strings.
  */
-fun RequiredArgumentBuilder<FabricClientCommandSource, *>.suggestList(
+fun <T : Any> RequiredArgumentBuilder<FabricClientCommandSource, T>.suggestList(
     list: () -> Collection<String>
-): RequiredArgumentBuilder<FabricClientCommandSource, *> {
+): RequiredArgumentBuilder<FabricClientCommandSource, T> {
     return suggests { _, builder ->
         list().forEach { builder.suggest(it) }
         builder.buildFuture()
@@ -59,10 +60,10 @@ fun RequiredArgumentBuilder<FabricClientCommandSource, *>.suggestList(
 }
 
 // Shortcut for word argument
-fun word(): StringArgumentType? = StringArgumentType.word()
+fun word(): ArgumentType<String> = StringArgumentType.word()
 
 // Shortcut for greedy string
-fun greedyString(): StringArgumentType? = StringArgumentType.greedyString()
+fun greedyString(): ArgumentType<String> = StringArgumentType.greedyString()
 
 // Helper to get string argument
 fun CommandContext<FabricClientCommandSource>.getString(name: String): String = 
