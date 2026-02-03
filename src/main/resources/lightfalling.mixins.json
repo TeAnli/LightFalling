@@ -6,11 +6,12 @@
   "mixins": [
   ],
   "client": [
+    "MixinClientConnection",
     "MixinClientPlayerEntity",
+    "MixinGameOptions",
     "MixinMinecraftClient",
     "MixinSimpleOption",
-    "MixinValidatingIntSliderCallbacks",
-    "MixinClientConnection"
+    "MixinValidatingIntSliderCallbacks"
   ],
   "injectors": {
     "defaultRequire": 1

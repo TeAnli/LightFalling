@@ -11,7 +11,7 @@ import top.teanli.lightfalling.module.modules.render.CustomFOV;
 
 @Mixin(SimpleOption.class)
 public class MixinSimpleOption<T> {
-
+    @SuppressWarnings("unchecked")
     @Inject(method = "getValue", at = @At("RETURN"), cancellable = true)
     private void onGetValue(CallbackInfoReturnable<T> cir) {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().options == null)
@@ -20,7 +20,7 @@ public class MixinSimpleOption<T> {
         if (this == (Object) MinecraftClient.getInstance().options.getGamma()) {
             if (BrightnessChanger.INSTANCE.getState()
                     && BrightnessChanger.INSTANCE.getMode().getValue().equals("Gamma")) {
-                cir.setReturnValue((T) Double.valueOf(BrightnessChanger.INSTANCE.getBrightness().getValue()));
+                cir.setReturnValue((T) BrightnessChanger.INSTANCE.getBrightness().getValue());
             }
         } else if (this == (Object) MinecraftClient.getInstance().options.getFov()) {
             if (CustomFOV.INSTANCE.getState()) {

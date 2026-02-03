@@ -2,6 +2,7 @@ package top.teanli.lightfalling.module
 
 import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Formatting
+import org.apache.logging.log4j.LogManager
 import top.teanli.lightfalling.event.Event
 import top.teanli.lightfalling.event.EventListener
 import top.teanli.lightfalling.module.setting.*
@@ -24,7 +25,7 @@ abstract class Module(
         private set
 
     val settings = mutableListOf<Setting<*>>()
-
+    protected val log = LogManager.getLogger("LightFalling")
     /**
      * Creation helpers for settings
      */

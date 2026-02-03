@@ -1,7 +1,6 @@
 package top.teanli.lightfalling.module
 
 import org.apache.logging.log4j.LogManager
-import org.slf4j.LoggerFactory
 import top.teanli.lightfalling.Lightfalling
 import top.teanli.lightfalling.config.ConfigSystem
 import top.teanli.lightfalling.event.EventManager
@@ -11,6 +10,7 @@ import top.teanli.lightfalling.tool.PackageScanner
  * Module Manager
  * Responsible for automatic scanning, registration, lifecycle management, and querying of modules.
  */
+@Suppress("UNUSED_PARAMETER")
 object ModuleManager {
     private val modules = mutableListOf<Module>()
 
@@ -58,13 +58,14 @@ object ModuleManager {
             if (instance is Module) return instance
         } catch (e: Exception) {
             // Not a Kotlin object, continue to regular instantiation
+            log.error("Failed to instantiate module: ${clazz.name}", e)
         }
 
         // Try to instantiate via default constructor
         return try {
             clazz.getDeclaredConstructor().newInstance()
         } catch (e: Exception) {
-            log.error("Failed to instantiate module: ${clazz.name}")
+            log.error("Failed to instantiate module: ${clazz.name}", e)
             null
         }
     }

@@ -60,6 +60,7 @@ object SetCommand : Command("set", "Modify module settings") {
                                 MessageTool.info("Set ${setting.name} to $valueStr")
                             } catch (e: Exception) {
                                 MessageTool.error("Invalid value: $valueStr")
+                                log.error("Error setting value: $valueStr", e)
                             }
                             1
                         }

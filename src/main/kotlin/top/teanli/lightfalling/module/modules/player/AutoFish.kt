@@ -10,6 +10,7 @@ import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 
+@Suppress("UNUSED_PARAMETER")
 object AutoFish : Module("AutoFish", "Automatically catches fish for you", ModuleCategory.PLAYER) {
 
     private val castDelay = slider("Cast Delay", 15.0, 5.0, 50.0, 0)

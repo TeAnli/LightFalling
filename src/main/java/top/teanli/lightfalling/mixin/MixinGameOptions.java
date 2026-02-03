@@ -1,11 +1,7 @@
 package top.teanli.lightfalling.mixin;
 
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.SimpleOption;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import top.teanli.lightfalling.module.modules.render.CustomFOV;
 
 @Mixin(GameOptions.class)
 public class MixinGameOptions {

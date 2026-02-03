@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.fabricmc.loader.api.FabricLoader
+import org.apache.logging.log4j.LogManager
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.module.setting.*
 import java.io.File
@@ -17,7 +18,7 @@ object ConfigSystem {
     private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
     private val configDir: File = FabricLoader.getInstance().configDir.resolve("LightFalling").toFile()
     private val configFile: File = configDir.resolve("config.json")
-
+    private val log = LogManager.getLogger("LightFalling")
     init {
         if (!configDir.exists()) {
             configDir.mkdirs()
@@ -94,11 +95,12 @@ object ConfigSystem {
                         }
                     } catch (e: Exception) {
                         // Skip invalid settings
+                        log.error("Error setting value: $setting", e)
                     }
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            log.error("Error loading config", e)
         }
     }
 }
