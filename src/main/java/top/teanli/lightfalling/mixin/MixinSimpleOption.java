@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.teanli.lightfalling.module.modules.render.BrightnessChanger;
+import top.teanli.lightfalling.module.modules.render.CustomFOV;
 
 @Mixin(SimpleOption.class)
 public class MixinSimpleOption<T> {
@@ -16,11 +17,26 @@ public class MixinSimpleOption<T> {
         if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().options == null)
             return;
 
-        SimpleOption<Double> gammaOption = MinecraftClient.getInstance().options.getGamma();
-        if (this == (Object) gammaOption) {
+        if (this == (Object) MinecraftClient.getInstance().options.getGamma()) {
             if (BrightnessChanger.INSTANCE.getState()
                     && BrightnessChanger.INSTANCE.getMode().getValue().equals("Gamma")) {
                 cir.setReturnValue((T) Double.valueOf(BrightnessChanger.INSTANCE.getBrightness().getValue()));
+            }
+        } else if (this == (Object) MinecraftClient.getInstance().options.getFov()) {
+            if (CustomFOV.INSTANCE.getState()) {
+                cir.setReturnValue((T) Integer.valueOf(CustomFOV.INSTANCE.getFov().getValue().intValue()));
+            }
+        }
+    }
+
+    @Inject(method = "setValue", at = @At("HEAD"))
+    private void onSetValue(T value, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        if (MinecraftClient.getInstance() == null || MinecraftClient.getInstance().options == null)
+            return;
+
+        if (this == (Object) MinecraftClient.getInstance().options.getFov()) {
+            if (CustomFOV.INSTANCE.getState() && value instanceof Integer) {
+                CustomFOV.INSTANCE.getFov().setValue(((Integer) value).doubleValue());
             }
         }
     }

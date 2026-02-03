@@ -9,8 +9,7 @@
     "MixinClientPlayerEntity",
     "MixinMinecraftClient",
     "MixinSimpleOption",
-    "MixinClientConnection",
-    "MixinGameRenderer"
+    "MixinClientConnection"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -49,12 +49,13 @@ fun <T : Any> RequiredArgumentBuilder<FabricClientCommandSource, T>.suggest(
 
 /**
  * Simple suggestion helper for a list of strings.
+ * The lambda provides the command context if needed.
  */
 fun <T : Any> RequiredArgumentBuilder<FabricClientCommandSource, T>.suggestList(
-    list: () -> Collection<String>
+    list: (CommandContext<FabricClientCommandSource>) -> Collection<String>
 ): RequiredArgumentBuilder<FabricClientCommandSource, T> {
-    return suggests { _, builder ->
-        list().forEach { builder.suggest(it) }
+    return suggests { context, builder ->
+        list(context).forEach { builder.suggest(it) }
         builder.buildFuture()
     }
 }
