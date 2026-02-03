@@ -10,12 +10,6 @@
   "icon": "assets/lightfalling/icon.png",
   "environment": "client",
   "entrypoints": {
-    "fabric-datagen": [
-      "top.teanli.lightfalling.client.LightfallingDataGenerator"
-    ],
-    "client": [
-      "top.teanli.lightfalling.client.LightfallingClient"
-    ],
     "main": [
       "top.teanli.lightfalling.Lightfalling"
     ]

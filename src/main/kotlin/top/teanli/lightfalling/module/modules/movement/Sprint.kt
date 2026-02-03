@@ -5,7 +5,7 @@ import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 
-class Sprint : Module("Sprint", "Automatically sprints for you", ModuleCategory.MOVEMENT) {
+class Sprint : Module("Sprint", "Automatically sprints for you", ModuleCategory.PLAYER) {
     
     val tickEvent = listen<TickEvent> {
         if (mc.player != null && mc.player!!.forwardSpeed > 0 && !mc.player!!.isSneaking && !mc.player!!.horizontalCollision) {
