@@ -1,5 +1,6 @@
 package top.teanli.lightfalling.module.modules.player
 
+import net.minecraft.item.FishingRodItem
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
@@ -12,51 +13,103 @@ import top.teanli.lightfalling.module.ModuleCategory
 object AutoFish : Module("AutoFish", "Automatically catches fish for you", ModuleCategory.PLAYER) {
 
     private val castDelay = slider("Cast Delay", 15.0, 5.0, 50.0, 0)
-    private var tickCounter = 0
-    private var shouldCast = false
+    private val reactionDelay = slider("Reaction Delay", 0.0, 0.0, 10.0, 0)
+    private val variation = slider("Variation", 5.0, 0.0, 20.0, 0)
+
+    private var tickCounter = -1
+    private var reelState = State.NONE
+    
+    private enum class State {
+        NONE,
+        REELING,
+        CASTING
+    }
 
     private val onPacket = listen<PacketEvent.Receive> {
         val packet = it.packet
         if (packet is PlaySoundS2CPacket) {
-            // Check if the sound is the fishing bobber splash
-            if (packet.sound.value().id.path == SoundEvents.ENTITY_FISHING_BOBBER_SPLASH.id.path) {
+            val soundId = packet.sound.value().id
+            if (soundId == SoundEvents.ENTITY_FISHING_BOBBER_SPLASH.id) {
                 val player = mc.player ?: return@listen
-                val fishObject = player.fishHook ?: return@listen
-                
-                // Check if the sound is close to our bobber
-                val dist = fishObject.squaredDistanceTo(packet.x, packet.y, packet.z)
+                val fishHook = player.fishHook ?: return@listen
+
+                val dist = fishHook.squaredDistanceTo(packet.x, packet.y, packet.z)
                 if (dist <= 4.0) {
-                    reelIn()
+                    startReelIn()
                 }
             }
         }
     }
 
     private val onTick = listen<TickEvent> {
-        if (shouldCast) {
-            if (tickCounter > 0) {
-                tickCounter--
-            } else {
-                cast()
-                shouldCast = false
+        val player = mc.player ?: return@listen
+        
+        // If not holding a rod, do nothing and reset state
+        if (player.mainHandStack.item !is FishingRodItem && player.offHandStack.item !is FishingRodItem) {
+            reelState = State.NONE
+            tickCounter = -1
+            return@listen
+        }
+
+        // Auto cast if enabled and not fishing
+        if (reelState == State.NONE && player.fishHook == null && tickCounter == -1) {
+            startCast()
+            return@listen
+        }
+
+        if (tickCounter > 0) {
+            tickCounter--
+        } else if (tickCounter == 0) {
+            tickCounter = -1
+            when (reelState) {
+                State.REELING -> executeReelIn()
+                State.CASTING -> executeCast()
+                else -> {}
             }
         }
     }
 
-    private fun reelIn() {
-        // Right click to reel in
-        mc.interactionManager?.interactItem(mc.player, Hand.MAIN_HAND)
-        shouldCast = true
-        tickCounter = castDelay.value.toInt()
+    private fun startReelIn() {
+        if (reelState != State.NONE) return
+        reelState = State.REELING
+        tickCounter = getDelayedTicks(reactionDelay.value.toInt())
     }
 
-    private fun cast() {
-        // Right click to cast
-        mc.interactionManager?.interactItem(mc.player, Hand.MAIN_HAND)
+    private fun executeReelIn() {
+        val player = mc.player ?: return
+        val hand = if (player.mainHandStack.item is FishingRodItem) Hand.MAIN_HAND else Hand.OFF_HAND
+        
+        player.swingHand(hand)
+        mc.interactionManager?.interactItem(player, hand)
+        
+        reelState = State.NONE // Reset state after reeling to allow startCast to be called next
+        startCast()
+    }
+
+    private fun startCast() {
+        if (reelState != State.NONE) return
+        reelState = State.CASTING
+        tickCounter = getDelayedTicks(castDelay.value.toInt())
+    }
+
+    private fun executeCast() {
+        val player = mc.player ?: return
+        val hand = if (player.mainHandStack.item is FishingRodItem) Hand.MAIN_HAND else Hand.OFF_HAND
+        
+        player.swingHand(hand)
+        mc.interactionManager?.interactItem(player, hand)
+        
+        reelState = State.NONE
+    }
+
+    private fun getDelayedTicks(base: Int): Int {
+        val varVal = variation.value.toInt()
+        val delay = if (varVal <= 0) base else base + (Math.random() * varVal).toInt()
+        return delay.coerceAtLeast(1) // Ensure at least 1 tick delay to avoid state overlap
     }
 
     override fun onEnable() {
-        tickCounter = 0
-        shouldCast = false
+        reelState = State.NONE
+        tickCounter = -1
     }
 }
