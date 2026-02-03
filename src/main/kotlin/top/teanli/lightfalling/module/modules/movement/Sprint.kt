@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.module.impl.movement
+package top.teanli.lightfalling.module.modules.movement
 
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory

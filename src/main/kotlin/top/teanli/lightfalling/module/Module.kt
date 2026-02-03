@@ -2,16 +2,23 @@ package top.teanli.lightfalling.module
 
 import net.minecraft.client.MinecraftClient
 
+/**
+ * Base class for all modules.
+ * Every functional module should inherit from this class.
+ */
 abstract class Module(
-    val name: String,
-    val description: String,
-    val category: ModuleCategory,
-    var key: Int = 0
+    val name: String,        // Module name
+    val description: String, // Module description
+    val category: ModuleCategory, // Module category
+    var key: Int = 0        // Key binding
 ) {
     protected val mc: MinecraftClient = MinecraftClient.getInstance()
     var isEnabled: Boolean = false
         private set
 
+    /**
+     * Toggles the module's enabled state.
+     */
     fun toggle() {
         if (isEnabled) {
             disable()
@@ -20,6 +27,9 @@ abstract class Module(
         }
     }
 
+    /**
+     * Enables the module.
+     */
     fun enable() {
         if (!isEnabled) {
             isEnabled = true
@@ -27,6 +37,9 @@ abstract class Module(
         }
     }
 
+    /**
+     * Disables the module.
+     */
     fun disable() {
         if (isEnabled) {
             isEnabled = false
@@ -36,5 +49,9 @@ abstract class Module(
 
     protected open fun onEnable() {}
     protected open fun onDisable() {}
+    
+    /**
+     * Logic to be executed every tick.
+     */
     open fun onUpdate() {}
 }

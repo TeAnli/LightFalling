@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.module.impl.render
+package top.teanli.lightfalling.module.modules.render
 
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
