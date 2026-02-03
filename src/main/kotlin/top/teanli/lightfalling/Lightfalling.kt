@@ -2,7 +2,7 @@ package top.teanli.lightfalling
 
 import net.fabricmc.api.ModInitializer
 import org.apache.logging.log4j.LogManager
-import top.teanli.lightfalling.command.CommandManager
+import top.teanli.lightfalling.command.CommandSystem
 import top.teanli.lightfalling.module.ModuleManager
 
 class Lightfalling : ModInitializer {
@@ -12,7 +12,7 @@ class Lightfalling : ModInitializer {
         log.info("Initializing lightfalling")
         ModuleManager.init()
         log.info("Module loaded")
-        CommandManager.init()
+        CommandSystem.init()
         log.info("Command loaded")
     }
 }
