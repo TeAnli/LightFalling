@@ -22,4 +22,10 @@ enum class EventPriority(val value: Int) {
 /**
  * Base class for all events.
  */
-abstract class Event
+abstract class Event {
+    var isCancelled: Boolean = false
+    
+    fun cancel() {
+        isCancelled = true
+    }
+}
