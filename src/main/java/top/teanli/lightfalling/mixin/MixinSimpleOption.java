@@ -17,9 +17,10 @@ public class MixinSimpleOption<T> {
             return;
 
         SimpleOption<Double> gammaOption = MinecraftClient.getInstance().options.getGamma();
-        if ((Object) this == (Object) gammaOption) {
-            if (BrightnessChanger.INSTANCE.getState()) {
-                cir.setReturnValue((T) Double.valueOf(BrightnessChanger.INSTANCE.getBrightness()));
+        if (this == (Object) gammaOption) {
+            if (BrightnessChanger.INSTANCE.getState()
+                    && BrightnessChanger.INSTANCE.getMode().getValue().equals("Gamma")) {
+                cir.setReturnValue((T) Double.valueOf(BrightnessChanger.INSTANCE.getBrightness().getValue()));
             }
         }
     }
