@@ -9,6 +9,7 @@
     "MixinClientPlayerEntity",
     "MixinMinecraftClient",
     "MixinSimpleOption",
+    "MixinValidatingIntSliderCallbacks",
     "MixinClientConnection"
   ],
   "injectors": {

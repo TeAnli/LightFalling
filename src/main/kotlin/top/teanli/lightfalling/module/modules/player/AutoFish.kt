@@ -44,16 +44,9 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
     private val onTick = listen<TickEvent> {
         val player = mc.player ?: return@listen
         
-        // If not holding a rod, do nothing and reset state
         if (player.mainHandStack.item !is FishingRodItem && player.offHandStack.item !is FishingRodItem) {
             reelState = State.NONE
             tickCounter = -1
-            return@listen
-        }
-
-        // Auto cast if enabled and not fishing
-        if (reelState == State.NONE && player.fishHook == null && tickCounter == -1) {
-            startCast()
             return@listen
         }
 
@@ -66,6 +59,9 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
                 State.CASTING -> executeCast()
                 else -> {}
             }
+        } else if (reelState == State.NONE && player.fishHook == null) {
+            // Auto cast if not fishing and no action pending
+            startCast()
         }
     }
 
@@ -79,11 +75,14 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
         val player = mc.player ?: return
         val hand = if (player.mainHandStack.item is FishingRodItem) Hand.MAIN_HAND else Hand.OFF_HAND
         
-        player.swingHand(hand)
         mc.interactionManager?.interactItem(player, hand)
+        player.swingHand(hand)
         
-        reelState = State.NONE // Reset state after reeling to allow startCast to be called next
-        startCast()
+        reelState = State.NONE
+        // We don't call startCast() here anymore, the onTick loop will catch it
+        // since reelState is now NONE and fishHook will be null soon.
+        // We set tickCounter to a small delay to prevent immediate re-casting in the same tick
+        tickCounter = getDelayedTicks(castDelay.value.toInt())
     }
 
     private fun startCast() {
@@ -96,8 +95,8 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
         val player = mc.player ?: return
         val hand = if (player.mainHandStack.item is FishingRodItem) Hand.MAIN_HAND else Hand.OFF_HAND
         
-        player.swingHand(hand)
         mc.interactionManager?.interactItem(player, hand)
+        player.swingHand(hand)
         
         reelState = State.NONE
     }
