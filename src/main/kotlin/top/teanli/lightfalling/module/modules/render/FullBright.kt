@@ -3,7 +3,7 @@ package top.teanli.lightfalling.module.modules.render
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 
-class FullBright : Module("FullBright", "Makes everything bright", ModuleCategory.DISPLAY) {
+class FullBright : Module("FullBright", "Makes everything bright", ModuleCategory.RENDER) {
     private var oldGamma: Double = 1.0
 
     override fun onEnable() {

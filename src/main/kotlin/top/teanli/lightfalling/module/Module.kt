@@ -1,6 +1,8 @@
 package top.teanli.lightfalling.module
 
 import net.minecraft.client.MinecraftClient
+import top.teanli.lightfalling.event.Event
+import top.teanli.lightfalling.event.EventListener
 
 /**
  * Base class for all modules.
@@ -11,10 +13,16 @@ abstract class Module(
     val description: String, // Module description
     val category: ModuleCategory, // Module category
     var key: Int = 0        // Key binding
-) {
+) : EventListener {
     protected val mc: MinecraftClient = MinecraftClient.getInstance()
     var isEnabled: Boolean = false
         private set
+
+    // List of functional event handlers from EventListener
+    override val eventHandlers = mutableListOf<EventListener.EventHandler<out Event>>()
+
+    override val isEventListenerActive: Boolean
+        get() = isEnabled
 
     /**
      * Toggles the module's enabled state.
@@ -52,6 +60,7 @@ abstract class Module(
     
     /**
      * Logic to be executed every tick.
+     * Deprecated: Use onEvent(TickEvent) instead.
      */
     open fun onUpdate() {}
 }

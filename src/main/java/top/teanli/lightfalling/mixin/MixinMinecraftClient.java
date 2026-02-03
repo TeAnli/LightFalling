@@ -1,0 +1,18 @@
+package top.teanli.lightfalling.mixin;
+
+import net.minecraft.client.MinecraftClient;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.teanli.lightfalling.event.EventManager;
+import top.teanli.lightfalling.event.impl.TickEvent;
+
+@Mixin(MinecraftClient.class)
+public class MixinMinecraftClient {
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void onTick(CallbackInfo info) {
+        EventManager.INSTANCE.post(new TickEvent());
+    }
+}

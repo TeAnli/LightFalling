@@ -1,6 +1,8 @@
 package top.teanli.lightfalling.module
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import top.teanli.lightfalling.event.Event
+import top.teanli.lightfalling.event.EventListener
+import top.teanli.lightfalling.event.EventManager
 import top.teanli.lightfalling.tool.PackageScanner
 
 /**
@@ -15,18 +17,13 @@ object ModuleManager {
      */
     fun init() {
         scanModules()
-
-        // Register client tick event to update enabled modules
-        ClientTickEvents.END_CLIENT_TICK.register {
-            modules.filter { it.isEnabled }.forEach { it.onUpdate() }
-        }
     }
 
     /**
      * Automatically scans and registers modules.
      */
     private fun scanModules() {
-        val classes = PackageScanner.scan("top.teanli.lightfalling.module.impl", Module::class.java)
+        val classes = PackageScanner.scan("top.teanli.lightfalling.module.modules", Module::class.java)
         
         classes.forEach { clazz ->
             try {
@@ -43,6 +40,8 @@ object ModuleManager {
      */
     private fun register(module: Module) {
         modules.add(module)
+        // Automatically subscribe to event manager
+        EventManager.subscribe(module)
     }
 
     /**
