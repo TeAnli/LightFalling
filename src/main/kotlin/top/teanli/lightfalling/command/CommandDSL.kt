@@ -1,6 +1,5 @@
 package top.teanli.lightfalling.command
 
-import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -27,7 +26,7 @@ fun <S : ArgumentBuilder<FabricClientCommandSource, S>> S.literal(
 
 fun <S : ArgumentBuilder<FabricClientCommandSource, S>> S.argument(
     name: String,
-    type: ArgumentType<*>,
+    type: StringArgumentType?,
     block: RequiredArgumentBuilder<FabricClientCommandSource, *>.() -> Unit = {}
 ): S {
     val builder = ClientCommandManager.argument(name, type)
