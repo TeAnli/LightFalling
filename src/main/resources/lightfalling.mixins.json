@@ -10,6 +10,7 @@
     "MixinClientPlayerEntity",
     "MixinGameOptions",
     "MixinMinecraftClient",
+
     "MixinClientPlayerInteractionManager",
     "MixinSimpleOption",
     "MixinValidatingIntSliderCallbacks",
