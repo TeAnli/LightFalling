@@ -1,15 +1,14 @@
-package top.teanli.lightfalling.module.modules.combat
-
+package top.teanli.lightfalling.module.modules.player
 
 import net.minecraft.item.AxeItem
+import top.teanli.lightfalling.accessor.IMinecraftClient
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
-import top.teanli.lightfalling.accessor.IMinecraftClient
 import java.util.Random
 
-class AutoClicker : Module("AutoClicker", "Automatically clicks for you", ModuleCategory.WORLD) {
+class AutoClicker : Module("AutoClicker", "Automatically clicks for you", ModuleCategory.PLAYER) {
 
     private val minCps = slider("MinCPS", 8.0, 1.0, 20.0, 1)
     private val maxCps = slider("MaxCPS", 12.0, 1.0, 20.0, 1)
@@ -26,41 +25,39 @@ class AutoClicker : Module("AutoClicker", "Automatically clicks for you", Module
     private var lastCpsUpdate = 0L
     private var currentTargetCps = 10.0
 
-    init {
-        listen<TickEvent> {
-            if (mc.currentScreen != null) return@listen
-            val player = mc.player ?: return@listen
+    private val onTick = listen<TickEvent> {
+        if (mc.currentScreen != null) return@listen
+        val player = mc.player ?: return@listen
 
-            // Update target CPS occasionally to simulate human fluctuation
-            if (System.currentTimeMillis() - lastCpsUpdate > 1000 + random.nextInt(2000)) {
-                currentTargetCps = minCps.value + random.nextDouble() * (maxCps.value - minCps.value)
-                lastCpsUpdate = System.currentTimeMillis()
-            }
+        // Update target CPS occasionally to simulate human fluctuation
+        if (System.currentTimeMillis() - lastCpsUpdate > 1000 + random.nextInt(2000)) {
+            currentTargetCps = minCps.value + random.nextDouble() * (maxCps.value - minCps.value)
+            lastCpsUpdate = System.currentTimeMillis()
+        }
 
-            // Left Click
-            if (leftClick.value) {
-                if (!holdToClick.value || mc.options.attackKey.isPressed) {
-                    if (onlyWeapon.value) {
-                        val item = player.mainHandStack.item
-                        if (item !is AxeItem) return@listen
+        // Left Click
+        if (leftClick.value) {
+            if (!holdToClick.value || mc.options.attackKey.isPressed) {
+                if (onlyWeapon.value) {
+                    val item = player.mainHandStack.item
+                    if (item !is AxeItem) return@listen
+                }
+
+                if (System.currentTimeMillis() >= nextLeftClick) {
+                    if (random.nextDouble() > dropClickChance.value) {
+                        clickLeft()
                     }
-
-                    if (System.currentTimeMillis() >= nextLeftClick) {
-                        if (random.nextDouble() > dropClickChance.value) {
-                            clickLeft()
-                        }
-                        generateNextLeftDelay()
-                    }
+                    generateNextLeftDelay()
                 }
             }
+        }
 
-            // Right Click
-            if (rightClick.value) {
-                if (!holdToClick.value || mc.options.useKey.isPressed) {
-                    if (System.currentTimeMillis() >= nextRightClick) {
-                        clickRight()
-                        generateNextRightDelay()
-                    }
+        // Right Click
+        if (rightClick.value) {
+            if (!holdToClick.value || mc.options.useKey.isPressed) {
+                if (System.currentTimeMillis() >= nextRightClick) {
+                    clickRight()
+                    generateNextRightDelay()
                 }
             }
         }
@@ -69,7 +66,7 @@ class AutoClicker : Module("AutoClicker", "Automatically clicks for you", Module
     private fun clickLeft() {
         val imc = mc as IMinecraftClient
         imc.invokeDoAttack()
-        
+
         if (jitter.value > 0) {
             mc.player?.apply {
                 yaw += (random.nextFloat() - 0.5f) * jitter.value.toFloat() * 0.1f

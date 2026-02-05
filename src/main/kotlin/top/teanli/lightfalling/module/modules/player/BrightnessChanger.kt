@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.module.modules.render
+package top.teanli.lightfalling.module.modules.player
 
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
@@ -7,14 +7,14 @@ import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 
-object BrightnessChanger : Module("BrightnessChanger", "Modifies the game brightness (Gamma)", ModuleCategory.WORLD) {
-    
+object BrightnessChanger : Module("BrightnessChanger", "Modifies the game brightness (Gamma)", ModuleCategory.PLAYER) {
+
     val mode = mode("Mode", "Gamma", listOf("Gamma", "Potion"))
     val brightness = slider("Brightness", 10.0, 1.0, 20.0, 1) { mode.value == "Gamma" }
 
     private val nightVision = listen<TickEvent> {
         val player = mc.player ?: return@listen
-        
+
         if (mode.value == "Potion") {
             player.addStatusEffect(StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 0, false, false, false))
         } else {

@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import top.teanli.lightfalling.module.modules.render.BrightnessChanger;
-import top.teanli.lightfalling.module.modules.render.CustomFOV;
+import top.teanli.lightfalling.module.modules.player.BrightnessChanger;
+import top.teanli.lightfalling.module.modules.player.CustomFOV;
 
 @Mixin(SimpleOption.class)
 public class MixinSimpleOption<T> {

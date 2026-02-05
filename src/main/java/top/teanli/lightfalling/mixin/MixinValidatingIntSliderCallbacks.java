@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import top.teanli.lightfalling.module.modules.render.CustomFOV;
+import top.teanli.lightfalling.module.modules.player.CustomFOV;
 
 @Mixin(targets = "net.minecraft.client.option.SimpleOption$ValidatingIntSliderCallbacks")
 public class MixinValidatingIntSliderCallbacks {
