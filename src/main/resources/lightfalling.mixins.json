@@ -10,8 +10,10 @@
     "MixinClientPlayerEntity",
     "MixinGameOptions",
     "MixinMinecraftClient",
+    "MixinClientPlayerInteractionManager",
     "MixinSimpleOption",
-    "MixinValidatingIntSliderCallbacks"
+    "MixinValidatingIntSliderCallbacks",
+    "MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
