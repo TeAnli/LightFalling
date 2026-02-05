@@ -9,7 +9,7 @@ import top.teanli.lightfalling.module.ModuleCategory
 import top.teanli.lightfalling.accessor.IMinecraftClient
 import java.util.Random
 
-class AutoClicker : Module("AutoClicker", "Automatically clicks for you", ModuleCategory.COMBAT) {
+class AutoClicker : Module("AutoClicker", "Automatically clicks for you", ModuleCategory.WORLD) {
 
     private val minCps = slider("MinCPS", 8.0, 1.0, 20.0, 1)
     private val maxCps = slider("MaxCPS", 12.0, 1.0, 20.0, 1)
