@@ -27,6 +27,14 @@ class Render3DEvent(
 ) : Event()
 
 /**
+ * Event posted when rendering the HUD in 2D.
+ */
+class Render2DEvent(
+    val drawContext: net.minecraft.client.gui.DrawContext,
+    val tickDelta: Float
+) : Event()
+
+/**
  * Event posted when the player attacks an entity.
  */
 class AttackEvent(val target: net.minecraft.entity.Entity) : Event()

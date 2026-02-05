@@ -12,6 +12,7 @@
     "MixinMinecraftClient",
 
     "MixinClientPlayerInteractionManager",
+    "MixinInGameHud",
     "MixinSimpleOption",
     "MixinValidatingIntSliderCallbacks",
     "MixinWorldRenderer"
