@@ -21,7 +21,6 @@ public class MixinWorldRenderer {
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender3D(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f basicProjectionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci) {
         MatrixStack matrixStack = new MatrixStack();
-        // 不在这里乘视图矩阵，而是在渲染时手动减去相机坐标，这样更兼容
 
         net.minecraft.client.MinecraftClient mc = net.minecraft.client.MinecraftClient.getInstance();
         EventManager.INSTANCE.post(new Render3DEvent(

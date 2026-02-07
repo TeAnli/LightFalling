@@ -1,5 +1,8 @@
 package top.teanli.lightfalling.event.impl
 
+import net.minecraft.client.render.entity.state.TntEntityRenderState
+import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.entity.TntEntity
 import net.minecraft.network.packet.Packet
 import top.teanli.lightfalling.event.Event
 
@@ -56,3 +59,5 @@ open class PacketEvent(val packet: Packet<*>) : Event() {
     class Receive(packet: Packet<*>) : PacketEvent(packet)
     class Send(packet: Packet<*>) : PacketEvent(packet)
 }
+
+class TNTRenderEvent(val tntEntityRenderState: TntEntityRenderState, val matrixStack: MatrixStack) : Event()

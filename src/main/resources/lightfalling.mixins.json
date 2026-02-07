@@ -8,12 +8,12 @@
   "client": [
     "MixinClientConnection",
     "MixinClientPlayerEntity",
-    "MixinGameOptions",
-    "MixinMinecraftClient",
-
     "MixinClientPlayerInteractionManager",
+    "MixinGameOptions",
     "MixinInGameHud",
+    "MixinMinecraftClient",
     "MixinSimpleOption",
+    "MixinTNTEntityRenderer",
     "MixinValidatingIntSliderCallbacks",
     "MixinWorldRenderer"
   ],
