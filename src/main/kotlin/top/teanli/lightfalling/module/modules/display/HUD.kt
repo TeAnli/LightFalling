@@ -5,6 +5,7 @@ import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 import top.teanli.lightfalling.tool.RenderTool
+import top.teanli.lightfalling.tool.TickRateTool
 import java.awt.Color
 
 object HUD : Module("HUD", "Displays player status information", ModuleCategory.DISPLAY) {
@@ -18,6 +19,8 @@ object HUD : Module("HUD", "Displays player status information", ModuleCategory.
     private val showCoords = checkbox("Coords", true)
     private val showFacing = checkbox("Facing", true)
     private val showFPS = checkbox("FPS", true)
+    private val showTPS = checkbox("TPS", true)
+    private val showMSPT = checkbox("MSPT", true)
     
     private val shadow = checkbox("Shadow", true)
     private val posX = slider("PosX", 10.0, 0.0, 1000.0, 0)
@@ -71,6 +74,26 @@ object HUD : Module("HUD", "Displays player status information", ModuleCategory.
 
         if (showFPS.value) {
             statusList.add("FPS: ${mc.currentFps}" to Color.WHITE)
+        }
+
+        if (showTPS.value) {
+            val tps = TickRateTool.tps
+            val color = when {
+                tps > 18.0f -> Color.GREEN
+                tps > 15.0f -> Color.YELLOW
+                else -> Color.RED
+            }
+            statusList.add("TPS: ${String.format("%.1f", tps)}" to color)
+        }
+
+        if (showMSPT.value) {
+            val mspt = TickRateTool.getMspt()
+            val color = when {
+                mspt < 35.0f -> Color.GREEN
+                mspt < 50.0f -> Color.YELLOW
+                else -> Color.RED
+            }
+            statusList.add("MSPT: ${String.format("%.1f", mspt)}" to color)
         }
 
         // Render the status list
