@@ -10,6 +10,7 @@ import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
+import kotlin.math.pow
 
 class DamageIndicator : Module(
     "DamageIndicator",
@@ -41,8 +42,9 @@ class DamageIndicator : Module(
 
         // Remove expired damages and move them upward slightly
         damages.removeIf { time - it.startTime > lifeTime.value }
-        damages.forEach { it.pos = it.pos.add(0.0, 0.015, 0.0) }
-
+        if (animationType.value != "Scale") {
+            damages.forEach { it.pos = it.pos.add(0.0, 0.015, 0.0) }
+        }
         // Detect damage by comparing current health to last known health
         world.entities.forEach { entity ->
             if (entity is LivingEntity) {
@@ -90,16 +92,14 @@ class DamageIndicator : Module(
             
             // Apply scale animation
             if (animationType.value == "Scale") {
-                val progress = elapsed.toDouble() / lifeTime.value
-                // Simple pop-out and shrink effect
-                val animationScale = if (progress < 0.2) {
-                    (progress / 0.2) * 1.2 // Pop up to 1.2x in first 20% of lifetime
-                } else {
-                    1.2 - ((progress - 0.2) / 0.8) * 0.2 // Shrink back to 1.0x over remaining 80%
-                }
+                val animDurationRatio = 0.3
+                val progress = (elapsed.toDouble() / (lifeTime.value * animDurationRatio)).coerceIn(0.0, 1.0)
+                val startScale = 0.0
+                val endScale = 1.0
+                val eased = 1.0 - (1.0 - progress).pow(2.0)
+                val animationScale = startScale + (endScale - startScale) * eased
                 scaleF *= animationScale.toFloat()
             }
-
             matrixStack.scale(scaleF, -scaleF, scaleF)
 
             // Center text
