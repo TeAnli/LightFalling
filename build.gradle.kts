@@ -45,6 +45,7 @@ dependencies {
     modImplementation(libs.fabric.loader)
     modImplementation(libs.fabric.kotlin)
     modImplementation(libs.fabric.api)
+    modImplementation(libs.mcef)
 }
 
 tasks.processResources {
