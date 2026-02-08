@@ -88,9 +88,4 @@ abstract class Module(
     protected open fun onEnable() {}
     protected open fun onDisable() {}
     
-    /**
-     * Logic to be executed every tick.
-     * Deprecated: Use onEvent(TickEvent) instead.
-     */
-    open fun onUpdate() {}
 }

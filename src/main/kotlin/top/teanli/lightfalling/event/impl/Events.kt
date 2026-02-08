@@ -1,9 +1,11 @@
 package top.teanli.lightfalling.event.impl
 
+import net.minecraft.client.render.Camera
+import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.state.TntEntityRenderState
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.TntEntity
 import net.minecraft.network.packet.Packet
+import org.joml.Matrix4f
 import top.teanli.lightfalling.event.Event
 
 /**
@@ -22,11 +24,15 @@ class MotionEvent(val stage: Stage) : Event() {
 
 /**
  * Event posted when rendering the world in 3D.
+ *
+ * NOTE: Added `matrixStack` so modules can render using Minecraft's MatrixStack
+ * (e.g. to draw text in world space). This is a non-breaking addition for Kotlin
+ * consumers since a new parameter was appended and Mixin will supply it.
  */
 class Render3DEvent(
-    val matrixStack: net.minecraft.client.util.math.MatrixStack,
-    val tickDelta: Float,
-    val vertexConsumerProvider: net.minecraft.client.render.VertexConsumerProvider
+    val camera: Camera,
+    val vertexConsumer: VertexConsumerProvider.Immediate,
+    val matrixStack: MatrixStack
 ) : Event()
 
 /**
@@ -35,6 +41,13 @@ class Render3DEvent(
 class Render2DEvent(
     val drawContext: net.minecraft.client.gui.DrawContext,
     val tickDelta: Float
+) : Event()
+
+/**
+ * Event posted during entity rendering.
+ */
+class RenderEntityEvent(
+    val matrixStack: MatrixStack
 ) : Event()
 
 /**
