@@ -3,6 +3,7 @@ package top.teanli.lightfalling.event.impl
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Camera
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.state.TntRenderState
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -35,6 +36,7 @@ class MotionEvent(val stage: Stage) : Event() {
 class Render3DEvent(
     val camera: Camera,
     val poseStack: PoseStack,
+    val buffer: MultiBufferSource.BufferSource,
     tickDelta: Float
 ) : Event()
 

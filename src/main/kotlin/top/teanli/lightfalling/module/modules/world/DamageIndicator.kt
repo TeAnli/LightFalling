@@ -1,9 +1,11 @@
 package top.teanli.lightfalling.module.modules.world
 
 import net.minecraft.client.gui.Font
+import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.Vec3
+import top.teanli.lightfalling.event.impl.EntityDamageEvent
 import top.teanli.lightfalling.event.impl.Render3DEvent
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
@@ -28,15 +30,14 @@ class DamageIndicator : Module(
 
     private val damages = mutableListOf<Damage>()
     private val lastHealth = mutableMapOf<Int, Float>()
-
     private fun addDamage(entity: Entity, damage: Float) {
         // Initial position above the entity's head in world coordinates
         val pos = entity.position().add(0.0, (entity as? LivingEntity)?.bbHeight?.toDouble() ?: 1.0, 0.0)
         damages.add(Damage(damage.toInt().toString(), pos, System.currentTimeMillis()))
     }
 
-    private val onTick = listen<TickEvent> {
-        val level = mc.level ?: return@listen
+    val onTick = listen<TickEvent> {
+        val world = mc.level ?: return@listen
         val time = System.currentTimeMillis()
 
         // Remove expired damages and move them upward slightly
@@ -44,9 +45,7 @@ class DamageIndicator : Module(
         if (animationType.value != "Scale") {
             damages.forEach { it.pos = it.pos.add(0.0, 0.015, 0.0) }
         }
-        // Detect damage by comparing current health to last known health
-        level.entitiesForRendering()
-            .forEach { entity ->
+        world.entitiesForRendering().forEach { entity ->
             if (entity is LivingEntity) {
                 val last = lastHealth[entity.id]
                 val current = entity.health
@@ -60,7 +59,7 @@ class DamageIndicator : Module(
         }
     }
 
-    private val onRender3D = listen<Render3DEvent> { event ->
+    val onRender3D = listen<Render3DEvent> { event ->
         if (damages.isEmpty()) return@listen
 
         val timeNow = System.currentTimeMillis()
@@ -101,12 +100,24 @@ class DamageIndicator : Module(
                 scaleF *= animationScale.toFloat()
             }
 
-            poseStack.scale(-scaleF, -scaleF, scaleF)
+            poseStack.scale(scaleF, -scaleF, scaleF)
 
             // Draw text centered
             val text = damage.amount
             val width = font.width(text)
-            font.drawInBatch(text, -width / 2f, 0f, color, true, poseStack.last().pose(), mc.renderBuffers().bufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 15728880)
+            font.drawInBatch(
+                text,
+                -width / 2f,
+                0f,
+                color,
+                true,
+                poseStack.last().pose(),
+                event.buffer,
+                Font.DisplayMode.SEE_THROUGH,
+                0,
+                15728880
+            )
+            mc.renderBuffers().bufferSource().endBatch()
 
             poseStack.popPose()
         }
