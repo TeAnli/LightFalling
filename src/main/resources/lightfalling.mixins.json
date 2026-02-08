@@ -9,13 +9,12 @@
     "MixinClientConnection",
     "MixinClientPlayerEntity",
     "MixinClientPlayerInteractionManager",
-    "MixinGameOptions",
+    "MixinGameRenderer",
     "MixinInGameHud",
     "MixinMinecraftClient",
     "MixinSimpleOption",
     "MixinTNTEntityRenderer",
     "MixinValidatingIntSliderCallbacks",
-    "MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

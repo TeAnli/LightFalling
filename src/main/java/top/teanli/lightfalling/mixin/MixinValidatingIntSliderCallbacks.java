@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.teanli.lightfalling.module.modules.player.CustomFOV;
 
-@Mixin(targets = "net.minecraft.client.option.SimpleOption$ValidatingIntSliderCallbacks")
+@Mixin(targets = "net.minecraft.client.OptionInstance$IntRange")
 public class MixinValidatingIntSliderCallbacks {
 
     @Inject(method = "maxInclusive", at = @At("RETURN"), cancellable = true)
