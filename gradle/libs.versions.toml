@@ -28,7 +28,7 @@ fabric-loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = 
 fabric-api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric-api" }
 fabric-kotlin = { group = "net.fabricmc", name = "fabric-language-kotlin", version.ref = "fabric-kotlin" }
 # Keep the existing mcef library
-mcef = { group = "org.montoyo", name = "mcef", version.ref = "mcef" }
+mcef = { group = "com.github.CCBlueX", name = "mcef", version.ref = "mcef" }
 
 [plugins]
 fabric-loom = { id = "fabric-loom", version.ref = "fabric-loom" }

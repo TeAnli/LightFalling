@@ -42,10 +42,13 @@ dependencies {
 
     minecraft(libs.minecraft)
     mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.kotlin)
-    modImplementation(libs.fabric.api)
-    modImplementation(libs.mcef)
+    modApi(libs.fabric.loader)
+    modApi(libs.fabric.kotlin)
+    modApi(libs.fabric.api)
+    modApi(libs.mcef)
+    modApi(libs.mcef)
+    include(libs.mcef)
+
 }
 
 tasks.processResources {
