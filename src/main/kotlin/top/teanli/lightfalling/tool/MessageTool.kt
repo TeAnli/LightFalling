@@ -1,20 +1,20 @@
 package top.teanli.lightfalling.tool
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
+import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 
 /**
  * Utility for sending messages to the player's chat.
  */
 object MessageTool {
-    private val prefix = "${Formatting.GRAY}[${Formatting.BLUE}LightFalling${Formatting.GRAY}] "
+    private val prefix = "${ChatFormatting.GRAY}[${ChatFormatting.BLUE}LightFalling${ChatFormatting.GRAY}] "
 
     /**
      * Sends a raw message to the chat.
      */
     fun sendRaw(message: String) {
-        MinecraftClient.getInstance().player?.sendMessage(Text.literal(message), false)
+        Minecraft.getInstance().player?.displayClientMessage(Component.literal(message), false)
     }
 
     /**
@@ -28,13 +28,13 @@ object MessageTool {
      * Sends an error message with the mod prefix and red color.
      */
     fun error(message: String) {
-        sendRaw(prefix + "${Formatting.RED}Error: $message")
+        sendRaw(prefix + "${ChatFormatting.RED}Error: $message")
     }
 
     /**
      * Sends a debug message (only if debug mode is enabled, or just plain info for now).
      */
     fun debug(message: String) {
-        info("${Formatting.YELLOW}[DEBUG] $message")
+        info("${ChatFormatting.YELLOW}[DEBUG] $message")
     }
 }
