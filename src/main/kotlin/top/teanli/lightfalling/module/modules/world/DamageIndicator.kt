@@ -1,10 +1,9 @@
 package top.teanli.lightfalling.module.modules.world
 
-import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.render.LightmapTextureManager
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.util.math.Vec3d
+import net.minecraft.client.gui.Font
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.phys.Vec3
 import top.teanli.lightfalling.event.impl.Render3DEvent
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
@@ -23,7 +22,7 @@ class DamageIndicator : Module(
 
     private data class Damage(
         val amount: String,
-        var pos: Vec3d, // Absolute world position
+        var pos: Vec3, // Absolute world position
         val startTime: Long
     )
 
@@ -32,12 +31,12 @@ class DamageIndicator : Module(
 
     private fun addDamage(entity: Entity, damage: Float) {
         // Initial position above the entity's head in world coordinates
-        val pos = entity.entityPos.add(0.0, (entity as? LivingEntity)?.height?.toDouble() ?: 1.0, 0.0)
+        val pos = entity.position().add(0.0, (entity as? LivingEntity)?.bbHeight?.toDouble() ?: 1.0, 0.0)
         damages.add(Damage(damage.toInt().toString(), pos, System.currentTimeMillis()))
     }
 
     private val onTick = listen<TickEvent> {
-        val world = mc.world ?: return@listen
+        val level = mc.level ?: return@listen
         val time = System.currentTimeMillis()
 
         // Remove expired damages and move them upward slightly
@@ -46,7 +45,8 @@ class DamageIndicator : Module(
             damages.forEach { it.pos = it.pos.add(0.0, 0.015, 0.0) }
         }
         // Detect damage by comparing current health to last known health
-        world.entities.forEach { entity ->
+        level.entitiesForRendering()
+            .forEach { entity ->
             if (entity is LivingEntity) {
                 val last = lastHealth[entity.id]
                 val current = entity.health
@@ -64,10 +64,10 @@ class DamageIndicator : Module(
         if (damages.isEmpty()) return@listen
 
         val timeNow = System.currentTimeMillis()
-        val matrixStack = event.matrixStack
+        val poseStack = event.poseStack
         val camera = event.camera
-        val cameraPos = camera.cameraPos
-        val textRenderer: TextRenderer = mc.textRenderer
+        val cameraPos = camera.position()
+        val font: Font = mc.font
 
         damages.forEach { damage ->
             val elapsed = timeNow - damage.startTime
@@ -76,16 +76,16 @@ class DamageIndicator : Module(
             val alpha = (255 * (1.0 - (elapsed.toDouble() / lifeTime.value))).toInt().coerceIn(0, 255)
             val color = (alpha shl 24) or 0xFF0000 // Red color for damage
 
-            matrixStack.push()
+            poseStack.pushPose()
 
             // Translate from world coordinates to camera-relative coordinates
             val x = damage.pos.x - cameraPos.x
             val y = damage.pos.y - cameraPos.y
             val z = damage.pos.z - cameraPos.z
-            matrixStack.translate(x.toFloat(), y.toFloat(), z.toFloat())
+            poseStack.translate(x.toFloat(), y.toFloat(), z.toFloat())
 
             // Billboard rotation (facing camera)
-            matrixStack.multiply(camera.rotation)
+            poseStack.mulPose(camera.rotation())
 
             // Apply scale
             var scaleF = (0.02f * size.value.toFloat()).coerceAtLeast(0.001f)
@@ -100,31 +100,15 @@ class DamageIndicator : Module(
                 val animationScale = startScale + (endScale - startScale) * eased
                 scaleF *= animationScale.toFloat()
             }
-            matrixStack.scale(scaleF, -scaleF, scaleF)
 
-            // Center text
+            poseStack.scale(-scaleF, -scaleF, scaleF)
+
+            // Draw text centered
             val text = damage.amount
-            val textWidth = textRenderer.getWidth(text)
-            
-            textRenderer.draw(
-                text,
-                -textWidth / 2.0f,
-                0.0f,
-                color,
-                true,
-                matrixStack.peek().positionMatrix,
-                event.vertexConsumer,
-                TextRenderer.TextLayerType.SEE_THROUGH,
-                0,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE
-            )
+            val width = font.width(text)
+            font.drawInBatch(text, -width / 2f, 0f, color, true, poseStack.last().pose(), mc.renderBuffers().bufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 15728880)
 
-            matrixStack.pop()
+            poseStack.popPose()
         }
-    }
-
-    override fun onDisable() {
-        damages.clear()
-        lastHealth.clear()
     }
 }

@@ -1,9 +1,9 @@
 package top.teanli.lightfalling.module.modules.player
 
-import net.minecraft.item.FishingRodItem
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Hand
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.item.FishingRodItem
 import top.teanli.lightfalling.event.impl.PacketEvent
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
@@ -28,13 +28,13 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
 
     private val onPacket = listen<PacketEvent.Receive> {
         val packet = it.packet
-        if (packet is PlaySoundS2CPacket) {
-            val soundId = packet.sound.value().id
-            if (soundId == SoundEvents.ENTITY_FISHING_BOBBER_SPLASH.id) {
+        if (packet is ClientboundSoundPacket) {
+            val soundId = packet.sound.value().location
+            if (soundId == SoundEvents.FISHING_BOBBER_SPLASH.location) {
                 val player = mc.player ?: return@listen
-                val fishHook = player.fishHook ?: return@listen
+                val fishHook = player.fishing ?: return@listen
 
-                val dist = fishHook.squaredDistanceTo(packet.x, packet.y, packet.z)
+                val dist = fishHook.distanceToSqr(packet.x, packet.y, packet.z)
                 if (dist <= 4.0) {
                     startReelIn()
                 }
@@ -45,7 +45,7 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
     private val onTick = listen<TickEvent> {
         val player = mc.player ?: return@listen
         
-        if (player.mainHandStack.item !is FishingRodItem && player.offHandStack.item !is FishingRodItem) {
+        if (player.mainHandItem.item !is FishingRodItem && player.offhandItem.item !is FishingRodItem) {
             reelState = State.NONE
             tickCounter = -1
             return@listen
@@ -60,7 +60,7 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
                 State.CASTING -> executeCast()
                 else -> {}
             }
-        } else if (reelState == State.NONE && player.fishHook == null) {
+        } else if (reelState == State.NONE && player.fishing == null) {
             // Auto cast if not fishing and no action pending
             startCast()
         }
@@ -74,15 +74,12 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
 
     private fun executeReelIn() {
         val player = mc.player ?: return
-        val hand = if (player.mainHandStack.item is FishingRodItem) Hand.MAIN_HAND else Hand.OFF_HAND
+        val hand = if (player.mainHandItem.item is FishingRodItem) InteractionHand.MAIN_HAND else InteractionHand.OFF_HAND
         
-        mc.interactionManager?.interactItem(player, hand)
-        player.swingHand(hand)
+        mc.gameMode?.useItem(player, hand)
+        player.swing(hand)
         
         reelState = State.NONE
-        // We don't call startCast() here anymore, the onTick loop will catch it
-        // since reelState is now NONE and fishHook will be null soon.
-        // We set tickCounter to a small delay to prevent immediate re-casting in the same tick
         tickCounter = getDelayedTicks(castDelay.value.toInt())
     }
 
@@ -94,18 +91,17 @@ object AutoFish : Module("AutoFish", "Automatically catches fish for you", Modul
 
     private fun executeCast() {
         val player = mc.player ?: return
-        val hand = if (player.mainHandStack.item is FishingRodItem) Hand.MAIN_HAND else Hand.OFF_HAND
+        val hand = if (player.mainHandItem.item is FishingRodItem) InteractionHand.MAIN_HAND else InteractionHand.OFF_HAND
         
-        mc.interactionManager?.interactItem(player, hand)
-        player.swingHand(hand)
+        mc.gameMode?.useItem(player, hand)
+        player.swing(hand)
         
         reelState = State.NONE
     }
 
     private fun getDelayedTicks(base: Int): Int {
-        val varVal = variation.value.toInt()
-        val delay = if (varVal <= 0) base else base + (Math.random() * varVal).toInt()
-        return delay.coerceAtLeast(1) // Ensure at least 1 tick delay to avoid state overlap
+        val v = variation.value.toInt()
+        return base + if (v > 0) (0..v).random() else 0
     }
 
     override fun onEnable() {

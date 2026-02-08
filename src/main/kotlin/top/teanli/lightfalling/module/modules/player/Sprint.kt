@@ -11,9 +11,9 @@ class Sprint : Module("Sprint", "Automatically sprints for you", ModuleCategory.
         if (it.stage == MotionEvent.Stage.PRE) {
             val player = mc.player ?: return@listen
 
-            if (!player.isSneaking &&
+            if (!player.isMovingSlowly &&
                 !player.horizontalCollision &&
-                player.hungerManager.foodLevel > 6 &&
+                player.foodData.foodLevel > 6 &&
                 !player.isUsingItem) {
                 player.isSprinting = true
             }

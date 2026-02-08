@@ -1,6 +1,6 @@
 package top.teanli.lightfalling.module.modules.player
 
-import net.minecraft.item.AxeItem
+import net.minecraft.world.item.AxeItem
 import top.teanli.lightfalling.accessor.IMinecraftClient
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
@@ -26,7 +26,7 @@ class AutoClicker : Module("AutoClicker", "Automatically clicks for you", Module
     private var currentTargetCps = 10.0
 
     private val onTick = listen<TickEvent> {
-        if (mc.currentScreen != null) return@listen
+        if (mc.screen != null) return@listen
         val player = mc.player ?: return@listen
 
         // Update target CPS occasionally to simulate human fluctuation
@@ -37,9 +37,9 @@ class AutoClicker : Module("AutoClicker", "Automatically clicks for you", Module
 
         // Left Click
         if (leftClick.value) {
-            if (!holdToClick.value || mc.options.attackKey.isPressed) {
+            if (!holdToClick.value || mc.options.keyAttack.isDown) {
                 if (onlyWeapon.value) {
-                    val item = player.mainHandStack.item
+                    val item = player.mainHandItem.item
                     if (item !is AxeItem) return@listen
                 }
 
@@ -54,7 +54,7 @@ class AutoClicker : Module("AutoClicker", "Automatically clicks for you", Module
 
         // Right Click
         if (rightClick.value) {
-            if (!holdToClick.value || mc.options.useKey.isPressed) {
+            if (!holdToClick.value || mc.options.keyUse.isDown) {
                 if (System.currentTimeMillis() >= nextRightClick) {
                     clickRight()
                     generateNextRightDelay()
@@ -69,8 +69,8 @@ class AutoClicker : Module("AutoClicker", "Automatically clicks for you", Module
 
         if (jitter.value > 0) {
             mc.player?.apply {
-                yaw += (random.nextFloat() - 0.5f) * jitter.value.toFloat() * 0.1f
-                pitch += (random.nextFloat() - 0.5f) * jitter.value.toFloat() * 0.1f
+                yRot += (random.nextFloat() - 0.5f) * jitter.value.toFloat() * 0.1f
+                xRot += (random.nextFloat() - 0.5f) * jitter.value.toFloat() * 0.1f
             }
         }
     }

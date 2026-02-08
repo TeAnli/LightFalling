@@ -2,7 +2,7 @@ package top.teanli.lightfalling.command.impl
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
-import net.minecraft.util.Formatting
+import net.minecraft.ChatFormatting
 import top.teanli.lightfalling.command.Command
 import top.teanli.lightfalling.command.execute
 import top.teanli.lightfalling.command.literal
@@ -14,7 +14,7 @@ object ListCommand : Command("list", "List all modules") {
         builder.literal(name) {
             execute {
                 val modules = ModuleManager.getModules().joinToString(", ") {
-                    if (it.state) "${Formatting.GREEN}${it.name}" else "${Formatting.RED}${it.name}"
+                    if (it.state) "${ChatFormatting.GREEN}${it.name}" else "${ChatFormatting.RED}${it.name}"
                 }
                 MessageTool.info("Modules: $modules")
                 1

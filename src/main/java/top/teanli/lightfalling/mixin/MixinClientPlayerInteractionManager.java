@@ -1,10 +1,10 @@
 package top.teanli.lightfalling.mixin;
 
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,16 +14,16 @@ import top.teanli.lightfalling.event.EventManager;
 import top.teanli.lightfalling.event.impl.AttackEvent;
 import top.teanli.lightfalling.event.impl.ClickBlockEvent;
 
-@Mixin(ClientPlayerInteractionManager.class)
+@Mixin(MultiPlayerGameMode.class)
 public class MixinClientPlayerInteractionManager {
-    @Inject(method = "attackEntity", at = @At("HEAD"))
-    private void onAttackEntity(PlayerEntity player, Entity target, CallbackInfo ci) {
+    @Inject(method = "attack", at = @At("HEAD"))
+    private void onAttackEntity(Player player, Entity target, CallbackInfo ci) {
         if (target != null) {
             EventManager.INSTANCE.post(new AttackEvent(target));
         }
     }
 
-    @Inject(method = "attackBlock", at = @At("HEAD"))
+    @Inject(method = "startDestroyBlock", at = @At("HEAD"))
     private void onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         EventManager.INSTANCE.post(new ClickBlockEvent(pos, direction));
     }

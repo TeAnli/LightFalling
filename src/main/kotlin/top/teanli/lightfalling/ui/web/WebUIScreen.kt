@@ -1,72 +1,116 @@
 package top.teanli.lightfalling.ui.web
 
-import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.client.gl.RenderPipelines
-import net.minecraft.client.gui.Click
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.input.CharInput
-import net.minecraft.client.input.KeyInput
-import net.minecraft.text.Text
+import net.ccbluex.liquidbounce.mcef.MCEF
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.input.CharacterEvent
+import net.minecraft.client.input.KeyEvent
+import net.minecraft.client.input.MouseButtonEvent
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.network.chat.Component
 
-class WebUIScreen(val webUI: WebUI) : Screen(Text.literal("WebUI")) {
+class WebUIScreen(val webUI: WebUI) : Screen(Component.literal("WebUI")) {
 
     override fun init() {
         super.init()
-        webUI.resize(width, height)
+        webUI.browser?.setFocus(true)
     }
 
-    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        super.render(context, mouseX, mouseY, delta)
+    override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick)
 
         val browser = webUI.browser ?: return
 
-        if (browser.isTextureReady) {
-            context.drawTexture(
-                RenderPipelines.GUI_TEXTURED,
-                browser.textureLocation,
-                0, 0,
-                0f, 0f,
-                width, height,
-                width, height
-            )
+        // Update MCEF message loop
+        MCEF.INSTANCE.app.handle.N_DoMessageLoopWork()
+
+        // Render the browser texture
+        guiGraphics.blit(
+            RenderPipelines.GUI_TEXTURED,
+            browser.textureLocation,
+            0, 0,
+            0f, 0f,
+            width, height,
+            width, height
+        )
+        
+        guiGraphics.drawString(font, "WebUI - ${webUI.url}", 5, 5, -1)
+    }
+
+    override fun keyPressed(keyEvent: KeyEvent): Boolean {
+        webUI.browser?.let {
+            it.sendKeyPress(keyEvent.key, keyEvent.scancode.toLong(), keyEvent.modifiers)
+            it.setFocus(true)
+            return true
         }
-
-        browser.sendMouseMove(mouseX, mouseY)
+        return super.keyPressed(keyEvent)
     }
 
-
-    override fun keyPressed(input: KeyInput): Boolean {
-        webUI.browser?.sendKeyPress(input.key, input.scancode.toLong(), input.modifiers)
-        return super.keyPressed(input)
+    override fun keyReleased(keyEvent: KeyEvent): Boolean {
+        webUI.browser?.let {
+            it.sendKeyRelease(keyEvent.key, keyEvent.scancode.toLong(), keyEvent.modifiers)
+            it.setFocus(true)
+            return true
+        }
+        return super.keyReleased(keyEvent)
     }
 
-    override fun keyReleased(input: KeyInput): Boolean {
-        webUI.browser?.sendKeyRelease(input.key, input.scancode.toLong(), input.modifiers)
-        return super.keyReleased(input)
+    override fun charTyped(charEvent: CharacterEvent): Boolean {
+        webUI.browser?.let {
+            it.sendKeyTyped(charEvent.codepoint.toChar(), charEvent.modifiers)
+            it.setFocus(true)
+            return true
+        }
+        return super.charTyped(charEvent)
     }
 
-    override fun charTyped(input: CharInput): Boolean {
-        webUI.browser?.sendKeyTyped(input.codepoint.toChar(), input.modifiers)
-        return super.charTyped(input)
+    override fun mouseClicked(mouseButtonEvent: MouseButtonEvent, bl: Boolean): Boolean {
+        webUI.browser?.let {
+            it.sendMousePress(mouseButtonEvent.x.toInt(), mouseButtonEvent.y.toInt(), mouseButtonEvent.button())
+            it.setFocus(true)
+            return true
+        }
+        return super.mouseClicked(mouseButtonEvent, bl)
     }
 
-
-    override fun mouseReleased(click: Click): Boolean {
-        webUI.browser?.sendMouseRelease(click.x.toInt() , click.y.toInt(), click.button())
-        return super.mouseReleased(click)
+    override fun mouseReleased(mouseButtonEvent: MouseButtonEvent): Boolean {
+        webUI.browser?.let {
+            it.sendMouseRelease(mouseButtonEvent.x.toInt(), mouseButtonEvent.y.toInt(), mouseButtonEvent.button())
+            it.setFocus(true)
+            return true
+        }
+        return super.mouseReleased(mouseButtonEvent)
     }
 
-    override fun mouseClicked(click: Click, doubled: Boolean): Boolean {
-        webUI.browser?.sendMousePress(click.x.toInt(), click.y.toInt(), click.button())
-        return super.mouseClicked(click, doubled)
+    override fun mouseMoved(mouseX: Double, mouseY: Double) {
+        webUI.browser?.sendMouseMove(mouseX.toInt(), mouseY.toInt())
+        super.mouseMoved(mouseX, mouseY)
     }
 
-    override fun close() {
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
+        webUI.browser?.sendMouseWheel(mouseX.toInt(), mouseY.toInt(), scrollY)
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)
+    }
+
+    private fun mapButton(button: Int): Int {
+        return when (button) {
+            0 -> 0 // Left
+            1 -> 2 // Right -> JCEF Right
+            2 -> 1 // Middle -> JCEF Middle
+            else -> button
+        }
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        webUI.resize(width, height)
+    }
+
+    override fun onClose() {
         webUI.close()
-        super.close()
+        super.onClose()
     }
 
-    override fun shouldPause(): Boolean = false
+    override fun isPauseScreen(): Boolean = false
 }

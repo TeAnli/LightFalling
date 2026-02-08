@@ -1,5 +1,6 @@
 package top.teanli.lightfalling.module.modules.player
 
+import net.minecraft.world.phys.Vec3
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
@@ -25,21 +26,19 @@ class AntiAFK : Module("AntiAFK", "Prevents you from being kicked for being AFK"
 
         when (mode.value) {
             "Rotate" -> {
-                player.yaw += (random.nextFloat() - 0.5f) * 45f
-                player.pitch = (random.nextFloat() - 0.5f) * 20f
+                player.yRot += (random.nextFloat() - 0.5f) * 45f
+                player.xRot = (random.nextFloat() - 0.5f) * 20f
             }
             "Jump" -> {
-                if (player.isOnGround) {
-                    player.jump()
+                if (player.onGround()) {
+                    player.jumpFromGround()
                 }
             }
             "Move" -> {
-                // Slight movement forward and then back is complex in a single tick
-                // So we just apply a tiny velocity
-                val yawRad = Math.toRadians(player.yaw.toDouble())
+                val yawRad = Math.toRadians(player.yRot.toDouble())
                 val x = -sin(yawRad) * 0.1
                 val z = cos(yawRad) * 0.1
-                player.setVelocity(x, player.velocity.y, z)
+                player.deltaMovement = Vec3(x, player.deltaMovement.y, z)
             }
         }
 

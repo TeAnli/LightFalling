@@ -1,7 +1,7 @@
 package top.teanli.lightfalling.module.modules.player
 
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
@@ -16,14 +16,14 @@ object BrightnessChanger : Module("BrightnessChanger", "Modifies the game bright
         val player = mc.player ?: return@listen
 
         if (mode.value == "Potion") {
-            player.addStatusEffect(StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 0, false, false, false))
+            player.addEffect(MobEffectInstance(MobEffects.NIGHT_VISION, 1000, 0, false, false, false))
         } else {
             // If we just switched from Potion to Gamma, remove the effect we added
-            if (player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
-                val effect = player.getStatusEffect(StatusEffects.NIGHT_VISION)
+            if (player.hasEffect(MobEffects.NIGHT_VISION)) {
+                val effect = player.getEffect(MobEffects.NIGHT_VISION)
                 // Only remove if it's our "infinite" effect (check duration or ambient)
                 if (effect != null && effect.duration > 500 && !effect.isAmbient) {
-                    player.removeStatusEffect(StatusEffects.NIGHT_VISION)
+                    player.removeEffect(MobEffects.NIGHT_VISION)
                 }
             }
         }
@@ -34,7 +34,7 @@ object BrightnessChanger : Module("BrightnessChanger", "Modifies the game bright
 
     override fun onDisable() {
         if (mode.value == "Potion") {
-            mc.player?.removeStatusEffect(StatusEffects.NIGHT_VISION)
+            mc.player?.removeEffect(MobEffects.NIGHT_VISION)
         }
     }
 }

@@ -1,6 +1,7 @@
 package top.teanli.lightfalling.module.modules.player
 
-import net.minecraft.screen.slot.SlotActionType
+import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.item.Item
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
@@ -14,7 +15,7 @@ class AutoFill : Module("AutoFill", "Automatically refills items in your hotbar"
     private var delayTimer = 0
 
     private val onTick = listen<TickEvent> {
-        if (mc.currentScreen != null) return@listen
+        if (mc.screen != null) return@listen
 
         if (delayTimer > 0) {
             delayTimer--
@@ -26,10 +27,10 @@ class AutoFill : Module("AutoFill", "Automatically refills items in your hotbar"
 
         // Check hotbar slots (0-8)
         for (i in 0..8) {
-            val stack = inventory.getStack(i)
+            val stack = inventory.getItem(i)
 
             // If slot is empty or below threshold (and stackable)
-            if (stack.isEmpty || (stack.isStackable && stack.count <= threshold.value && stack.count < stack.maxCount)) {
+            if (stack.isEmpty || (stack.isStackable && stack.count <= threshold.value && stack.count < stack.maxStackSize)) {
                 val targetItem = if (stack.isEmpty) null else stack.item
 
                 // Look for matching item in main inventory (9-35)
@@ -49,13 +50,13 @@ class AutoFill : Module("AutoFill", "Automatically refills items in your hotbar"
      * If targetItem is null, it might be harder to guess what the user wants, 
      * but usually AutoFill is used when an item just ran out.
      */
-    private fun findReplacement(targetItem: net.minecraft.item.Item?, hotbarSlot: Int): Int {
+    private fun findReplacement(targetItem: Item?, hotbarSlot: Int): Int {
         val inventory = mc.player?.inventory ?: return -1
         
         // If we know what item was there, look for the same item
         if (targetItem != null) {
             for (i in 9..35) {
-                val stack = inventory.getStack(i)
+                val stack = inventory.getItem(i)
                 if (!stack.isEmpty && stack.item == targetItem) {
                     return i
                 }
@@ -67,26 +68,16 @@ class AutoFill : Module("AutoFill", "Automatically refills items in your hotbar"
 
     private fun fillSlot(fromSlot: Int, toSlot: Int) {
         val player = mc.player ?: return
-        val interactionManager = mc.interactionManager ?: return
-        val syncId = player.currentScreenHandler.syncId
-        
-        // Convert inventory slot index to ScreenHandler slot index
-        // Player inventory slots in GenericContainer/Inventory screen:
-        // 0-8: Hotbar (mapped to 36-44 in PlayerScreenHandler)
-        // 9-35: Main inventory (mapped to 9-35 in PlayerScreenHandler)
-        // Note: In 1.21.1 PlayerScreenHandler, hotbar is 36-44, main is 9-35.
+        val gameMode = mc.gameMode ?: return
+        val containerId = player.containerMenu.containerId
         
         val fromScreenSlot = fromSlot // 9-35 matches
         val toScreenSlot = toSlot + 36 // 0-8 -> 36-44
         
-        // Quick move (Shift-Click) doesn't guarantee destination, so we use PICKUP (Click)
-        // Or swap: click from, then click to
+        gameMode.handleInventoryMouseClick(containerId, fromScreenSlot, 0, ClickType.PICKUP, player)
+        gameMode.handleInventoryMouseClick(containerId, toScreenSlot, 0, ClickType.PICKUP, player)
         
-        interactionManager.clickSlot(syncId, fromScreenSlot, 0, SlotActionType.PICKUP, player)
-        interactionManager.clickSlot(syncId, toScreenSlot, 0, SlotActionType.PICKUP, player)
-        
-        // If there's still item on cursor, put it back to the original slot
-        interactionManager.clickSlot(syncId, fromScreenSlot, 0, SlotActionType.PICKUP, player)
+        gameMode.handleInventoryMouseClick(containerId, fromScreenSlot, 0, ClickType.PICKUP, player)
     }
 
     override fun onEnable() {

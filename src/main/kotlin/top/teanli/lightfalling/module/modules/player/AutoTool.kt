@@ -1,11 +1,9 @@
 package top.teanli.lightfalling.module.modules.player
 
-import net.minecraft.block.BlockState
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.state.BlockState
 import top.teanli.lightfalling.event.impl.AttackEvent
 import top.teanli.lightfalling.event.impl.ClickBlockEvent
 import top.teanli.lightfalling.event.listen
@@ -27,7 +25,7 @@ class AutoTool : Module(
         if (!onMining.value) return@listen
         
         val player = mc.player ?: return@listen
-        val world = mc.world ?: return@listen
+        val world = mc.level ?: return@listen
         val state = world.getBlockState(event.pos)
         
         val bestSlot = findBestToolForBlock(state)
@@ -52,14 +50,14 @@ class AutoTool : Module(
 
     private fun findBestToolForBlock(state: BlockState): Int {
         val player = mc.player ?: return -1
-        var bestSpeed = player.mainHandStack.getMiningSpeedMultiplier(state)
+        var bestSpeed = player.mainHandItem.getDestroySpeed(state)
         var bestSlot = -1
 
         for (i in 0..8) {
-            val stack = player.inventory.getStack(i)
+            val stack = player.inventory.getItem(i)
             if (stack.isEmpty) continue
             
-            val speed = stack.getMiningSpeedMultiplier(state)
+            val speed = stack.getDestroySpeed(state)
             if (speed > bestSpeed) {
                 bestSpeed = speed
                 bestSlot = i
@@ -70,13 +68,12 @@ class AutoTool : Module(
 
     private fun findBestToolForEntity(target: LivingEntity): Int {
         val player = mc.player ?: return -1
-        val world = mc.world ?: return -1
         
-        var bestDamage = getAttackDamage(player.mainHandStack, target)
+        var bestDamage = getAttackDamage(player.mainHandItem, target)
         var bestSlot = -1
 
         for (i in 0..8) {
-            val stack = player.inventory.getStack(i)
+            val stack = player.inventory.getItem(i)
             if (stack.isEmpty) continue
             
             val damage = getAttackDamage(stack, target)
@@ -89,26 +86,11 @@ class AutoTool : Module(
     }
 
     private fun getAttackDamage(stack: ItemStack, target: LivingEntity): Float {
-        val player = mc.player ?: return 0f
-        
-        // In 1.21.1, the damage calculation has been completely moved to the component-based system.
-        // For a tool switcher, we can use a simpler approach: 
-        // 1. Get base damage from the item's attributes (via AttributeModifiersComponent)
-        // 2. Get enchantment damage (this is now more complex to calculate manually without a world context)
-        
-        // As a robust workaround for 1.21.1 tool switching, we can use the item's mining speed 
-        // as a proxy for its "tier" or just check if it's a sword/axe.
-        // However, to fix the compilation error, let's use the most direct way to get damage if possible.
-        
-        var damage = 1.0f
-        
-        // If it's a sword, we give it a high priority
-        if (stack.item.toString().contains("sword")) damage += 4f
-        if (stack.item.toString().contains("axe")) damage += 3f
-        
-        // We'll use this simplified logic for now to ensure it compiles and works for switching.
-        // True damage calculation in 1.21.1 requires access to the registry and components.
-        return damage
+        // Simplified damage check for tool switching in 1.21.1
+        // We look at the base attack damage attribute if present
+        return stack.item.components().get(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS)
+            ?.modifiers?.filter { it.attribute == Attributes.ATTACK_DAMAGE }
+            ?.sumOf { it.modifier.amount }?.toFloat() ?: 0f
     }
 
     override fun onDisable() {

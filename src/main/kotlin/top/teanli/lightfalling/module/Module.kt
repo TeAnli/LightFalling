@@ -1,7 +1,7 @@
 package top.teanli.lightfalling.module
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.util.Formatting
+import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import top.teanli.lightfalling.event.Event
 import top.teanli.lightfalling.event.EventListener
@@ -20,7 +20,7 @@ abstract class Module(
     val category: ModuleCategory, // Module category
     var key: Int = 0        // Key binding
 ) : EventListener {
-    protected val mc: MinecraftClient = MinecraftClient.getInstance()
+    protected val mc: Minecraft = Minecraft.getInstance()
     var state: Boolean = false
         private set
 
@@ -69,7 +69,7 @@ abstract class Module(
         if (!state) {
             state = true
             onEnable()
-            MessageTool.sendRaw("Enabled ${Formatting.GREEN}$name")
+            MessageTool.sendRaw("Enabled ${ChatFormatting.GREEN}$name")
         }
     }
 
@@ -80,7 +80,7 @@ abstract class Module(
         if (state) {
             state = false
             onDisable()
-            MessageTool.sendRaw("Disabled ${Formatting.RED}$name")
+            MessageTool.sendRaw("Disabled ${ChatFormatting.RED}$name")
         }
     }
 

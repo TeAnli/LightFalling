@@ -4,11 +4,10 @@ import com.mojang.brigadier.CommandDispatcher
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
-import net.minecraft.util.Formatting
+import net.minecraft.ChatFormatting
 import org.apache.logging.log4j.LogManager
 import top.teanli.lightfalling.tool.MessageTool
 import top.teanli.lightfalling.tool.PackageScanner
-import top.teanli.lightfalling.command.execute
 
 /**
  * Command Manager
@@ -79,7 +78,7 @@ object CommandSystem {
 
         // Default execution logic
         root.execute {
-            MessageTool.info("Use ${Formatting.BLUE}/lf toggle <module>${Formatting.WHITE} to toggle modules.")
+            MessageTool.info("Use ${ChatFormatting.BLUE}/lf toggle <module>${ChatFormatting.WHITE} to toggle modules.")
             1
         }
 

@@ -1,33 +1,25 @@
 package top.teanli.lightfalling.ui.web
 
 import net.ccbluex.liquidbounce.mcef.MCEF
+import net.ccbluex.liquidbounce.mcef.MCEFPlatform
 import net.ccbluex.liquidbounce.mcef.cef.MCEFBrowser
-import org.cef.browser.CefBrowser
-import org.cef.browser.CefFrame
-import org.cef.handler.CefLoadHandlerAdapter
 import org.cef.browser.CefMessageRouter
+import top.teanli.lightfalling.tool.Multithreading
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
-abstract class WebUI(val url: String) {
+class WebUI(val url: String) {
     var browser: MCEFBrowser? = null
     private var messageRouter: CefMessageRouter? = null
+    var unSupport: Boolean = false
 
-    init {
-        val mcef = MCEF.INSTANCE
-        if (mcef.initialize()) {
-            browser = mcef.createBrowser(url, true, null)
-
-            // Setup message router for JS bridge
-            val config = CefMessageRouter.CefMessageRouterConfig("mcefQuery", "mcefQueryCancel")
-            messageRouter = CefMessageRouter.create(config)
-            messageRouter?.addHandler(WebQueryHandler(), true)
-            browser?.client?.addMessageRouter(messageRouter)
-
-            // Register load handler for logging/debugging
-            browser?.client?.addLoadHandler(object : CefLoadHandlerAdapter() {
-                override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-                    MCEF.INSTANCE.LOGGER.info("WebUI loaded: $url with status $httpStatusCode")
-                }
-            })
+    fun initialize() {
+        MCEF.INSTANCE.initialize()
+        if (browser == null) {
+            val transparent = true
+            browser = MCEF.INSTANCE.createBrowser(url, transparent, null)
+            this.resize(1280, 720)
         }
     }
 
@@ -38,5 +30,33 @@ abstract class WebUI(val url: String) {
     fun close() {
         browser?.close(true)
         browser = null
+        
+        if (MCEFPlatform.getPlatform().isWindows) {
+            val processName = "jcef_helper.exe"
+            try {
+                val processBuilder = ProcessBuilder("tasklist")
+                val process = processBuilder.start()
+
+                val reader = BufferedReader(InputStreamReader(process.inputStream))
+                var line: String?
+                var isRunning = false
+                while ((reader.readLine().also { line = it }) != null) {
+                    if (line!!.contains(processName)) {
+                        isRunning = true
+                        break
+                    }
+                }
+                reader.close()
+
+                if (isRunning) {
+                    MCEF.INSTANCE.logger.warn("JCEF is still running, killing to avoid lingering processes.")
+                    val killProcess = ProcessBuilder("taskkill", "/F", "/IM", processName)
+                    killProcess.start()
+                }
+            } catch (e: Exception) {
+                MCEF.INSTANCE.logger.error("Unable to check if JCEF is still running.", e)
+            }
+        }
     }
+
 }

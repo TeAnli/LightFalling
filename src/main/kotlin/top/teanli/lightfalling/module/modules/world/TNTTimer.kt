@@ -1,59 +1,59 @@
 package top.teanli.lightfalling.module.modules.world
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.render.LightmapTextureManager
+import net.minecraft.client.gui.Font
+import net.minecraft.client.renderer.LightTexture
 import top.teanli.lightfalling.event.impl.TNTRenderEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 import top.teanli.lightfalling.module.ModuleManager
+import top.teanli.lightfalling.tool.RenderTool
+import java.awt.Color
 
 class TNTTimer : Module("TNTTimer", "Shows a timer for TNT explosions", ModuleCategory.WORLD) {
 
     val tntRenderEvent = listen<TNTRenderEvent> { event ->
 
-        if (event.tntEntityRenderState.fuse <= 0) {
+        if (event.tntEntityRenderState.fuseRemainingInTicks <= 0) {
             return@listen
         }
-        val timeLeft: Float = event.tntEntityRenderState.fuse / 20.0f
+        val timeLeft: Float = event.tntEntityRenderState.fuseRemainingInTicks / 20.0f
         val text = String.format("%.1f", timeLeft)
 
-        val client = MinecraftClient.getInstance()
-        val textRenderer = client.textRenderer
+        val font = mc.font
 
-        event.matrixStack.push()
+        event.poseStack.pushPose()
 
-        event.matrixStack.translate(0.5, 1.7, 0.5)
+        event.poseStack.translate(0.5, 1.7, 0.5)
 
-        val camera = client.gameRenderer.camera
+        val camera = mc.gameRenderer.mainCamera
         if (camera != null) {
-            val rotation = camera.rotation
-            event.matrixStack.multiply(rotation)
+            val rotation = camera.rotation()
+            event.poseStack.mulPose(rotation)
         }
 
         val scale = 0.025f
-        event.matrixStack.scale(scale, -scale, scale)
+        event.poseStack.scale(scale, -scale, scale)
 
-        val textWidth = textRenderer.getWidth(text)
+        val textWidth = RenderTool.getTextWidth(text)
         val xOffset = -textWidth / 2.0f
 
         val color = getColorByTime(timeLeft)
 
-        textRenderer.draw(
+        font.drawInBatch(
             text,
             xOffset,
             0.0f,
             color,
             true,
-            event.matrixStack.peek().positionMatrix,
-            client.bufferBuilders.entityVertexConsumers,
-            TextRenderer.TextLayerType.NORMAL,
+            event.poseStack.last().pose(),
+            mc.renderBuffers().bufferSource(),
+            Font.DisplayMode.NORMAL,
             0x60000000,
-            LightmapTextureManager.MAX_LIGHT_COORDINATE
+            LightTexture.FULL_BRIGHT,
         )
 
-        event.matrixStack.pop()
+        event.poseStack.popPose()
     }
 
     private fun getColorByTime(timeLeft: Float): Int {
