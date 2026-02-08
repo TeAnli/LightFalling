@@ -20,6 +20,7 @@ public class MixinTNTEntityRenderer {
             at = @At(
                 value = "INVOKE",
                 target = "Lcom/mojang/blaze3d/vertex/PoseStack;mulPose(Lorg/joml/Quaternionfc;)V",
+                shift = At.Shift.AFTER,
                 ordinal = 1
             )
     )
