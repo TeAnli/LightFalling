@@ -42,7 +42,6 @@ class Lightfalling : ModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register( { client ->
             while (browserGUI.consumeClick()) {
                 val sampleWebUI = WebUI("https://www.google.com/")
-                sampleWebUI.initialize()
                 Minecraft.getInstance().setScreen(WebUIScreen(sampleWebUI))
             }
 
