@@ -18,23 +18,28 @@ class WebUIScreen(val webUI: WebUI) : Screen(Component.literal("WebUI")) {
     }
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick)
-
         val browser = webUI.browser ?: return
 
         // Update MCEF message loop
         MCEF.INSTANCE.app.handle.N_DoMessageLoopWork()
-
-        // Render the browser texture
-        guiGraphics.blit(
-            RenderPipelines.GUI_TEXTURED,
-            browser.textureLocation,
-            0, 0,
-            0f, 0f,
-            width, height,
-            width, height
-        )
         
+        if (browser.isTextureReady) {
+            // Render the browser texture
+            guiGraphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                browser.textureLocation,
+                0, 0,
+                0f, 0f,
+                width, height,
+                width, height
+            )
+        } else {
+            // Draw a loading background if texture is not ready
+            guiGraphics.fill(0, 0, width, height, -0x1000000)
+            guiGraphics.drawCenteredString(font, "Loading Browser...", width / 2, height / 2, -1)
+        }
+        
+        super.render(guiGraphics, mouseX, mouseY, partialTick)
         guiGraphics.drawString(font, "WebUI - ${webUI.url}", 5, 5, -1)
     }
 
@@ -67,7 +72,7 @@ class WebUIScreen(val webUI: WebUI) : Screen(Component.literal("WebUI")) {
 
     override fun mouseClicked(mouseButtonEvent: MouseButtonEvent, bl: Boolean): Boolean {
         webUI.browser?.let {
-            it.sendMousePress(mouseButtonEvent.x.toInt(), mouseButtonEvent.y.toInt(), mouseButtonEvent.button())
+            it.sendMousePress(mouseButtonEvent.x.toInt(), mouseButtonEvent.y.toInt(), mapButton(mouseButtonEvent.button()))
             it.setFocus(true)
             return true
         }
@@ -76,7 +81,7 @@ class WebUIScreen(val webUI: WebUI) : Screen(Component.literal("WebUI")) {
 
     override fun mouseReleased(mouseButtonEvent: MouseButtonEvent): Boolean {
         webUI.browser?.let {
-            it.sendMouseRelease(mouseButtonEvent.x.toInt(), mouseButtonEvent.y.toInt(), mouseButtonEvent.button())
+            it.sendMouseRelease(mouseButtonEvent.x.toInt(), mouseButtonEvent.y.toInt(), mapButton(mouseButtonEvent.button()))
             it.setFocus(true)
             return true
         }

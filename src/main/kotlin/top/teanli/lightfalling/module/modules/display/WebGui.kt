@@ -16,7 +16,8 @@ class WebGui : Module("WebGui", "打开基于Web的图形界面", ModuleCategory
 
     override fun onEnable() {
         val mc = Minecraft.getInstance()
-        mc.setScreen(WebUIScreen(WebUI("https://www.google.com/")))
+        val webUI = WebUI("https://www.google.com/")
+        mc.setScreen(WebUIScreen(webUI))
         disable()
     }
 

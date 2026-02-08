@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.mcef.MCEF
 import net.ccbluex.liquidbounce.mcef.MCEFPlatform
 import net.ccbluex.liquidbounce.mcef.cef.MCEFBrowser
 import org.cef.browser.CefMessageRouter
+import org.cef.browser.CefMessageRouter.CefMessageRouterConfig
 import top.teanli.lightfalling.tool.Multithreading
 import java.io.BufferedReader
 import java.io.IOException
@@ -14,11 +15,22 @@ class WebUI(val url: String) {
     private var messageRouter: CefMessageRouter? = null
     var unSupport: Boolean = false
 
-    fun initialize() {
+    init {
+        // Ensure MCEF is initialized when the first WebUI is created
         MCEF.INSTANCE.initialize()
+
         if (browser == null) {
             val transparent = true
             browser = MCEF.INSTANCE.createBrowser(url, transparent, null)
+            
+            // Initialize Message Router
+            val config = CefMessageRouterConfig("mcefQuery", "mcefQueryCancel")
+            messageRouter = CefMessageRouter.create(config)
+            messageRouter?.addHandler(WebQueryHandler(), true)
+            
+            // Register router to the browser's client
+            browser?.client?.addMessageRouter(messageRouter)
+            
             this.resize(1280, 720)
         }
     }
@@ -28,6 +40,10 @@ class WebUI(val url: String) {
     }
 
     fun close() {
+        browser?.client?.removeMessageRouter(messageRouter)
+        messageRouter?.dispose()
+        messageRouter = null
+        
         browser?.close(true)
         browser = null
         
