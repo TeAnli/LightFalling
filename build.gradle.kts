@@ -41,7 +41,7 @@ allprojects {
 dependencies {
 
     minecraft(libs.minecraft)
-    mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
+    mappings(loom.officialMojangMappings())
     modApi(libs.fabric.loader)
     modApi(libs.fabric.kotlin)
     modApi(libs.fabric.api)
