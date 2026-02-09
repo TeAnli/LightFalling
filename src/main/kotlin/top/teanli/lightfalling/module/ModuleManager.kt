@@ -20,12 +20,7 @@ object ModuleManager {
      */
     fun init() {
         scanModules()
-        ConfigSystem.load()
-        
-        // Register shutdown hook to save config
-        Runtime.getRuntime().addShutdownHook(Thread {
-            ConfigSystem.save()
-        })
+
     }
 
     /**

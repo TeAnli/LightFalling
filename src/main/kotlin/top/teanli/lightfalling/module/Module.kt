@@ -3,8 +3,11 @@ package top.teanli.lightfalling.module
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
+import org.lwjgl.glfw.GLFW
 import top.teanli.lightfalling.event.Event
 import top.teanli.lightfalling.event.EventListener
+import top.teanli.lightfalling.event.impl.KeyEvent
+import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.setting.*
 import top.teanli.lightfalling.tool.MessageTool
 import java.awt.Color
@@ -51,6 +54,15 @@ abstract class Module(
     override val isEventListenerActive: Boolean
         get() = state
 
+    val onKey = listen<KeyEvent> { event ->
+        if (event.action == GLFW.GLFW_PRESS) {
+            ModuleManager.getModules().forEach { module ->
+                if (module.key != 0 && module.key == event.key) {
+                    module.toggle()
+                }
+            }
+        }
+    }
     /**
      * Toggles the module's enabled state.
      */

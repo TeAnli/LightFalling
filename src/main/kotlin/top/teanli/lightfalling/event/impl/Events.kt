@@ -79,3 +79,8 @@ open class PacketEvent(val packet: Packet<*>) : Event() {
 }
 
 class TNTRenderEvent(val tntEntityRenderState: TntRenderState, val poseStack: PoseStack) : Event()
+
+/**
+ * Event posted when a key is pressed or released.
+ */
+class KeyEvent(val key: Int, val scanCode: Int, val action: Int, val modifiers: Int) : Event()
