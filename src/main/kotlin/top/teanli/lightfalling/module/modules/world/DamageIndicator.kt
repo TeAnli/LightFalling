@@ -11,6 +11,7 @@ import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
+import java.awt.Color
 import kotlin.math.pow
 
 class DamageIndicator : Module(
@@ -21,6 +22,7 @@ class DamageIndicator : Module(
     private val lifeTime = slider("duration", 1000.0, 500.0, 3000.0, 0)
     private val size = slider("size", 1.0, 0.5, 3.0, 1)
     private val animationType = mode("animation", "Normal", listOf("Normal", "Scale"))
+    private val colorSetting = color("color", Color.RED)
 
     private data class Damage(
         val amount: String,
@@ -73,7 +75,8 @@ class DamageIndicator : Module(
             
             // compute fade alpha
             val alpha = (255 * (1.0 - (elapsed.toDouble() / lifeTime.value))).toInt().coerceIn(0, 255)
-            val color = (alpha shl 24) or 0xFF0000 // Red color for damage
+            val c = colorSetting.value
+            val color = (alpha shl 24) or (c.red shl 16) or (c.green shl 8) or c.blue
 
             poseStack.pushPose()
 
