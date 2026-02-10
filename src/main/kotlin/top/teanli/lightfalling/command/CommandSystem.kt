@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.ChatFormatting
 import org.apache.logging.log4j.LogManager
+import top.teanli.lightfalling.Lightfalling
 import top.teanli.lightfalling.tool.MessageTool
 import top.teanli.lightfalling.tool.PackageScanner
 
@@ -14,7 +15,6 @@ import top.teanli.lightfalling.tool.PackageScanner
  * Responsible for registering and managing client-side commands.
  */
 object CommandSystem {
-    private val log = LogManager.getLogger("Lightfalling")
     private val commands = mutableListOf<Command>()
 
     /**
@@ -39,10 +39,10 @@ object CommandSystem {
                 val instance = instantiateCommand(cmdClass)
                 if (instance != null) {
                     commands.add(instance)
-                    log.info("Registered command: ${instance.name}")
+                    Lightfalling.log.info("Registered command: ${instance.name}")
                 }
             } catch (e: Throwable) {
-                log.error("Failed to load command: ${cmdClass.name} (${e.javaClass.name}: ${e.message})")
+                Lightfalling.log.error("Failed to load command: ${cmdClass.name} (${e.javaClass.name}: ${e.message})")
             }
         }
     }
@@ -62,7 +62,7 @@ object CommandSystem {
         return try {
             clazz.getDeclaredConstructor().newInstance()
         } catch (e: Exception) {
-            log.error("Failed to instantiate command: ${clazz.name}")
+            Lightfalling.log.error("Failed to instantiate command: ${clazz.name}")
             null
         }
     }

@@ -2,13 +2,16 @@ package top.teanli.lightfalling
 
 import net.fabricmc.api.ModInitializer
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import top.teanli.lightfalling.command.CommandSystem
 import top.teanli.lightfalling.config.ConfigSystem
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.tool.ToolManager
 
 class Lightfalling : ModInitializer {
-    private val log = LogManager.getLogger("Lightfalling")
+    companion object{
+        val log: Logger = LogManager.getLogger("Lightfalling")
+    }
 
     override fun onInitialize() {
         log.info("Initializing lightfalling")

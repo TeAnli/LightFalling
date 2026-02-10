@@ -28,7 +28,6 @@ abstract class Module(
         private set
 
     val settings = mutableListOf<Setting<*>>()
-    protected val log = LogManager.getLogger("LightFalling")
     /**
      * Creation helpers for settings
      */

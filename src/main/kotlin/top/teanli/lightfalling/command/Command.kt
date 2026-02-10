@@ -11,7 +11,6 @@ abstract class Command(
     val name: String,
     val description: String
 ) {
-    protected val log = LogManager.getLogger("LightFalling")
     /**
      * Builds the command structure.
      */

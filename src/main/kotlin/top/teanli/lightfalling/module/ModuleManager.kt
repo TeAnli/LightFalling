@@ -14,7 +14,6 @@ import top.teanli.lightfalling.tool.PackageScanner
 object ModuleManager {
     private val modules = mutableListOf<Module>()
 
-    private val log = LogManager.getLogger(Lightfalling::class.java)
     /**
      * Initializes the module manager.
      */
@@ -37,7 +36,7 @@ object ModuleManager {
                     register(instance)
                 }
             } catch (e: Throwable) {
-                log.error("Failed to load module: ${moduleClass.name} (${e.javaClass.name}: ${e.message})")
+                Lightfalling.log.error("Failed to load module: ${moduleClass.name} (${e.javaClass.name}: ${e.message})")
             }
         }
     }
@@ -53,14 +52,14 @@ object ModuleManager {
             if (instance is Module) return instance
         } catch (e: Exception) {
             // Not a Kotlin object, continue to regular instantiation
-            log.error("Failed to instantiate module: ${clazz.name}", e)
+            Lightfalling.log.error("Failed to instantiate module: ${clazz.name}", e)
         }
 
         // Try to instantiate via default constructor
         return try {
             clazz.getDeclaredConstructor().newInstance()
         } catch (e: Exception) {
-            log.error("Failed to instantiate module: ${clazz.name}", e)
+            Lightfalling.log.error("Failed to instantiate module: ${clazz.name}", e)
             null
         }
     }
@@ -69,7 +68,7 @@ object ModuleManager {
      * Manually registers a module.
      */
     private fun register(module: Module) {
-        log.info("Registering module {}", module.name)
+        Lightfalling.log.info("Registering module {}", module.name)
         modules.add(module)
         // Automatically subscribe to event manager
         EventManager.subscribe(module)
