@@ -1,9 +1,12 @@
 package top.teanli.lightfalling.ui.clickgui
 
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.components.AbstractButton
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.Tooltip
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.input.InputWithModifiers
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
@@ -11,6 +14,7 @@ import org.lwjgl.glfw.GLFW
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 import top.teanli.lightfalling.module.ModuleManager
+import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
 
@@ -20,7 +24,53 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
     private var scrollOffset = 0.0
     private var isDraggingScrollbar = false
 
-    private val tabButtons = mutableListOf<Button>()
+    private val tabButtons = mutableListOf<CategoryTab>()
+
+    inner class CategoryTab(
+        val category: ModuleCategory,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int
+    ) : AbstractButton(x, y, width, height, Component.literal(category.categoryName.uppercase())) {
+        
+        override fun onPress(inputWithModifiers: InputWithModifiers) {
+            selectedCategory = category
+            scrollOffset = 0.0
+            this@ClickGUIScreen.refreshLayout()
+        }
+
+        override fun renderContents(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
+            val isSelected = selectedCategory == category
+            val color = if (isSelected) 0xAA000000.toInt() else if (isHovered) 0x70000000 else 0x40000000
+            val borderColor = if (isSelected) 0xFF555555.toInt() else if (isHovered) -1 else 0xFF333333.toInt()
+
+            val renderY = if (isSelected) y - 2 else y
+            val renderHeight = if (isSelected) height + 2 else height
+
+            guiGraphics.fill(x, renderY, x + width, renderY + renderHeight, color)
+
+            guiGraphics.fill(x, renderY, x + 1, renderY + renderHeight, borderColor) // 左
+            guiGraphics.fill(x, renderY, x + width, renderY + 1, borderColor) // 上
+            guiGraphics.fill(x + width - 1, renderY, x + width, renderY + renderHeight, borderColor) // 右
+
+            if (!isSelected) {
+                guiGraphics.fill(x, renderY + renderHeight - 1, x + width, renderY + renderHeight, borderColor)
+            }else{
+                guiGraphics.fill(x + (width / 2) - 10, renderY + renderHeight - 1, x + (width / 2) + 10, renderY + renderHeight, -1)
+            }
+
+            // 绘制文字 - 使用 drawCenteredString 确保渲染
+            val textX = x + width / 2
+            val textY = renderY + (renderHeight - 8) / 2
+            guiGraphics.drawCenteredString(font, message, textX, textY, if (isSelected) -1 else Color(200, 200, 200).rgb)
+        }
+
+
+
+
+        override fun updateWidgetNarration(narrationElementOutput: NarrationElementOutput) {}
+    }
 
     override fun init() {
         refreshLayout()
@@ -31,81 +81,79 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         tabButtons.clear()
         val centerX = width / 2
         
-        // Category Tabs at the top
-        val totalTabsWidth = ModuleCategory.entries.size * 95 - 5
+        // --- 自定义选项卡布局 ---
+        val categories = ModuleCategory.entries
+        val tabWidth = 70
+        val tabHeight = 20
+        val tabSpacing = 4
+        val totalTabsWidth = categories.size * tabWidth + (categories.size - 1) * tabSpacing
         var tabX = centerX - totalTabsWidth / 2
-        
-        ModuleCategory.entries.forEach { category ->
-            val isSelected = category == selectedCategory
-            val tabBtn = Button.builder(Component.literal(category.categoryName.uppercase())) {
-                selectedCategory = category
-                scrollOffset = 0.0
-                refreshLayout()
-            }.bounds(tabX, 10, 90, 20).build().apply {
-                active = !isSelected
-            }
-            tabButtons.add(tabBtn)
-            addRenderableWidget(tabBtn)
-            tabX += 95
-        }
 
-        // Modules vertically in the center
+
+        // --- 模块列表布局 ---
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
-        val buttonWidth = 150
-        val iconButtonWidth = 25
-        val buttonHeight = 20
-        val spacing = 5
-        val totalRowWidth = buttonWidth + (spacing + iconButtonWidth) * 2
-        val startX = centerX - totalRowWidth / 2
+        val listWidth = 300
+        val buttonHeight = 24
+        val rowSpacing = 6
+        val startX = centerX - listWidth / 2
+        
+        val toggleWidth = 40
+        val settingsWidth = 25
+        val mainBtnWidth = listWidth - toggleWidth - settingsWidth - (rowSpacing * 2)
+        
         var currentY = 50 + scrollOffset.toInt()
 
         modules.forEach { module ->
-            val prefix = if (module.state) "§a" else "§c"
-            val bindingText = if (bindingModule == module) "§b[...]" else if (module.key != 0) " §7[${GLFW.glfwGetKeyName(module.key, 0)?.uppercase() ?: module.key}]" else ""
+            val stateColor = if (module.state) "§a" else "§7"
+            val bindingText = if (bindingModule == module) "§b[...]" else if (module.key != 0) " §8[${GLFW.glfwGetKeyName(module.key, 0)?.uppercase() ?: module.key}]" else ""
             
-            // Main Module Button (Middle)
-            val moduleButton = Button.builder(Component.literal("$prefix${module.name}$bindingText")) { _ ->
+            val toggleBtn = Button.builder(Component.literal(if (module.state) "ON" else "OFF")) { _ ->
+                module.toggle()
+                refreshLayout()
+            }.bounds(startX, currentY, toggleWidth, buttonHeight).build()
+            addRenderableWidget(toggleBtn)
+
+            val moduleButton = Button.builder(Component.literal("$stateColor${module.name}$bindingText")) { _ ->
                 if (bindingModule == null) {
                     module.toggle()
                     refreshLayout()
                 }
-            }.bounds(startX + iconButtonWidth + spacing, currentY, buttonWidth, buttonHeight).build()
+            }.bounds(startX + toggleWidth + rowSpacing, currentY, mainBtnWidth, buttonHeight).build()
             
             moduleButton.setTooltip(Tooltip.create(Component.literal(module.description)))
             addRenderableWidget(moduleButton)
 
-            // Toggle Button (Left)
-            val toggleBtn = Button.builder(Component.literal(if (module.state) "ON" else "OFF")) { _ ->
-                module.toggle()
-                refreshLayout()
-            }.bounds(startX, currentY, iconButtonWidth, buttonHeight).build()
-            addRenderableWidget(toggleBtn)
-
-            // Settings Button (Right)
-            val settingsBtn = Button.builder(Component.literal("S")) { _ ->
+            val settingsBtn = Button.builder(Component.literal("⚙")) { _ ->
                 minecraft?.setScreen(ModuleSettingsScreen(module, this))
-            }.bounds(startX + iconButtonWidth + spacing + buttonWidth + spacing, currentY, iconButtonWidth, buttonHeight).build().apply {
-                setTooltip(Tooltip.create(Component.literal("Open Settings")))
+            }.bounds(startX + toggleWidth + mainBtnWidth + rowSpacing * 2, currentY, settingsWidth, buttonHeight).build().apply {
+                setTooltip(Tooltip.create(Component.literal("Configure ${module.name}")))
             }
             addRenderableWidget(settingsBtn)
             
-            currentY += buttonHeight + spacing
+            currentY += buttonHeight + rowSpacing
+        }
+
+        categories.forEach { category ->
+            val tab = CategoryTab(category, tabX, 25, tabWidth, tabHeight)
+            tabButtons.add(tab)
+            addRenderableWidget(tab)
+            tabX += tabWidth + tabSpacing
         }
     }
 
     private fun getContentHeight(): Int {
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
-        return modules.size * (20 + 5)
+        return modules.size * (24 + 6) + 10
     }
 
-    private fun getViewHeight(): Int = height - 80
+    private fun getViewHeight(): Int = height - 100
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
         val contentHeight = getContentHeight()
         val viewHeight = getViewHeight()
         
         if (contentHeight > viewHeight) {
-            scrollOffset += scrollY * 20
+            scrollOffset += scrollY * 24
             scrollOffset = min(0.0, max(scrollOffset, (viewHeight - contentHeight).toDouble()))
             refreshLayout()
             return true
@@ -117,35 +165,34 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         if (bindingModule != null) return false
 
         val centerX = width / 2
-        val buttonWidth = 150
-        val iconButtonWidth = 25
-        val spacing = 5
-        val totalRowWidth = buttonWidth + (spacing + iconButtonWidth) * 2
-        val bgX = centerX - totalRowWidth / 2 - 10
-        val bgW = totalRowWidth + 20
+        val listWidth = 320
+        val bgX = centerX - listWidth / 2
+        val bgW = listWidth
         
-        // Scrollbar interaction
-        val scrollbarX = bgX + bgW - 6
+        val scrollbarX = bgX + bgW - 8
         val viewHeight = getViewHeight()
         val contentHeight = getContentHeight()
         
-        if (contentHeight > viewHeight && mouseEvent.x >= scrollbarX && mouseEvent.x <= scrollbarX + 4 && mouseEvent.y >= 40 && mouseEvent.y <= 40 + viewHeight) {
+        if (contentHeight > viewHeight && mouseEvent.x >= scrollbarX && mouseEvent.x <= scrollbarX + 6 && mouseEvent.y >= 45 && mouseEvent.y <= 45 + viewHeight) {
             isDraggingScrollbar = true
             updateScrollFromMouse(mouseEvent.y)
             return true
         }
 
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
-        val startX = centerX - totalRowWidth / 2
+        val startX = centerX - 300 / 2
+        val toggleWidth = 40
+        val rowSpacing = 6
         val startY = 50 + scrollOffset.toInt()
 
         modules.forEachIndexed { index, module ->
-            val y = startY + index * (20 + spacing)
-            val x = startX + iconButtonWidth + spacing
+            val y = startY + index * (24 + rowSpacing)
+            val x = startX + toggleWidth + rowSpacing
+            val mainBtnWidth = 300 - 40 - 25 - (6 * 2)
 
-            if (y >= 40 && y <= height - 40) {
-                if (mouseEvent.x >= x && mouseEvent.x <= x + buttonWidth && mouseEvent.y >= y && mouseEvent.y <= y + 20) {
-                    if (mouseEvent.button() == 2) { // Middle Click
+            if (y >= 45 && y <= height - 55) {
+                if (mouseEvent.x >= x && mouseEvent.x <= x + mainBtnWidth && mouseEvent.y >= y && mouseEvent.y <= y + 24) {
+                    if (mouseEvent.button() == 2) {
                         bindingModule = module
                         refreshLayout()
                         return true
@@ -173,7 +220,7 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
     private fun updateScrollFromMouse(mouseY: Double) {
         val viewHeight = getViewHeight()
         val contentHeight = getContentHeight()
-        val trackY = 40
+        val trackY = 45
         
         val percentage = (mouseY - trackY) / viewHeight
         val targetOffset = -(percentage * contentHeight - viewHeight / 2)
@@ -192,6 +239,10 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
             refreshLayout()
             return true
         }
+        if (keyEvent.key == GLFW.GLFW_KEY_ESCAPE) {
+            onClose()
+            return true
+        }
         return super.keyPressed(keyEvent)
     }
 
@@ -199,52 +250,68 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         renderTransparentBackground(guiGraphics)
         
         val centerX = width / 2
-        val buttonWidth = 150
-        val iconButtonWidth = 25
-        val spacing = 5
-        val totalRowWidth = buttonWidth + (spacing + iconButtonWidth) * 2
+        val listWidth = 320
+        val bgX = centerX - listWidth / 2
+        val bgY = 45
+        val bgW = listWidth
+        val bgH = height - 90
         
-        // 2. Draw Category Tabs (Outside scissor)
-        tabButtons.forEach { it.render(guiGraphics, mouseX, mouseY, partialTick) }
+        // 1. 渲染模块列表容器背景
+        guiGraphics.fill(bgX, bgY, bgX + bgW, bgY + bgH, 0xAA000000.toInt())
+        
+        // 2. 绘制边框 (支持选中选项卡处的自动断开融合)
+        val borderColor = 0xFF555555.toInt()
+        val selectedTab = tabButtons.find { it.category == selectedCategory }
+        
+//        if (selectedTab != null) {
+        // 顶部边框 - 分段绘制以避开选中的选项卡
+        if (selectedTab!!.x > bgX) {
+            guiGraphics.fill(bgX - 1, bgY - 1, selectedTab.x, bgY, borderColor)
+        }
+        if (selectedTab.x + selectedTab.width < bgX + bgW) {
+            guiGraphics.fill(selectedTab.x + selectedTab.width, bgY - 1, bgX + bgW + 1, bgY, borderColor)
+        }
+//        } else {
+//            guiGraphics.fill(bgX - 1, bgY - 1, bgX + bgW + 1, bgY, borderColor)
+//        }
+//
+        // 绘制左、右、底部的边框
+        guiGraphics.fill(bgX - 1, bgY, bgX, bgY + bgH, borderColor) // 左
+        guiGraphics.fill(bgX + bgW, bgY, bgX + bgW + 1, bgY + bgH, borderColor) // 右
+        guiGraphics.fill(bgX - 1, bgY + bgH, bgX + bgW + 1, bgY + bgH + 1, borderColor) // 下
 
-        // 3. Draw list background
-        val bgX = centerX - totalRowWidth / 2 - 10
-        val bgY = 40
-        val bgW = totalRowWidth + 20
-        val bgH = height - 80
+        // 3. 渲染选项卡 (覆盖在列表顶部边框上)
+        tabButtons.forEach { it.render(guiGraphics, mouseX, mouseY, partialTick) }
         
-        guiGraphics.fill(bgX, bgY, bgX + bgW, bgY + bgH, 0x90000000.toInt())
-        
-        // 4. Draw Scrollbar
+        // 3. 绘制滚动条
         val contentHeight = getContentHeight()
         val viewHeight = getViewHeight()
         if (contentHeight > viewHeight) {
-            val scrollbarX = bgX + bgW - 6
+            val scrollbarX = bgX + bgW - 8
             val scrollbarHeight = max(20.0, (viewHeight.toDouble() / contentHeight) * viewHeight).toInt()
             val scrollbarY = bgY + ((-scrollOffset / (contentHeight - viewHeight)) * (viewHeight - scrollbarHeight)).toInt()
             
-            // Track
-            guiGraphics.fill(scrollbarX, bgY, scrollbarX + 4, bgY + bgH, 0x40FFFFFF.toInt())
-            // Thumb
-            guiGraphics.fill(scrollbarX, scrollbarY, scrollbarX + 4, scrollbarY + scrollbarHeight, 0xA0FFFFFF.toInt())
+            guiGraphics.fill(scrollbarX, bgY + 2, scrollbarX + 6, bgY + bgH - 2, 0x30FFFFFF.toInt())
+            guiGraphics.fill(scrollbarX, scrollbarY, scrollbarX + 6, scrollbarY + scrollbarHeight, 0x80FFFFFF.toInt())
         }
         
-        // 5. Scissor and render module list
+        // 4. 裁剪并渲染模块列表
         guiGraphics.enableScissor(bgX, bgY, bgX + bgW, bgY + bgH)
         children().forEach { 
-            if (it is Button && !tabButtons.contains(it)) {
+            if (it is Button) {
                 it.render(guiGraphics, mouseX, mouseY, partialTick)
             }
         }
         guiGraphics.disableScissor()
         
-        // 6. Draw instructions
-        guiGraphics.drawCenteredString(font, "§7Left: Toggle | Right: Bind (on Main) | Icons: Quick Actions", centerX, height - 20, -1)
+        val hintY = height - 30
+        guiGraphics.drawCenteredString(font, "§7Middle-Click on Module to Bind Key", centerX, hintY, -1)
+        guiGraphics.drawCenteredString(font, "§8LightFalling Client", centerX, hintY + 12, -1)
         
         if (bindingModule != null) {
-            guiGraphics.fill(0, 0, width, height, 0x70000000)
-            guiGraphics.drawCenteredString(font, "Press any key to bind §b${bindingModule?.name}§r...", centerX, height / 2, -1)
-            guiGraphics.drawCenteredString(font, "§7Press ESC to unbind", centerX, height / 2 + 15, -1)
+            guiGraphics.fill(0, 0, width, height, 0xCC000000.toInt())
+            guiGraphics.drawCenteredString(font, "Binding Key for §b${bindingModule?.name}", centerX, height / 2 - 10, -1)
+            guiGraphics.drawCenteredString(font, "§7Press any key... (ESC to clear)", centerX, height / 2 + 10, -1)
         }
     }
 
