@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.fabricmc.loader.api.FabricLoader
-import org.apache.logging.log4j.LogManager
 import top.teanli.lightfalling.Lightfalling
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.module.setting.*
@@ -27,6 +26,7 @@ object ConfigSystem {
 
     /**
      * Saves the current configuration to a file.
+     * Iterates through all modules and their settings, serializing them into a JSON structure.
      */
     fun save() {
         val rootObject = JsonObject()
@@ -35,6 +35,7 @@ object ConfigSystem {
         ModuleManager.getModules().forEach { module ->
             val moduleObject = JsonObject()
             moduleObject.addProperty("enabled", module.state)
+            moduleObject.addProperty("key", module.key)
 
             val settingsObject = JsonObject()
             module.settings.forEach { setting ->
@@ -60,6 +61,8 @@ object ConfigSystem {
 
     /**
      * Loads the configuration from the file.
+     * Reads the JSON structure and applies the saved states and settings to the corresponding modules.
+     * If the file doesn't exist or is invalid, it will simply skip loading without crashing.
      */
     fun load() {
         if (!configFile.exists()) return
@@ -76,6 +79,9 @@ object ConfigSystem {
                 if (enabled != module.state) {
                     module.toggle()
                 }
+
+                // Load keybind
+                module.key = moduleObject.get("key")?.asInt ?: 0
 
                 // Load settings
                 val settingsObject = moduleObject.getAsJsonObject("settings") ?: return@forEach
