@@ -1,7 +1,7 @@
 package top.teanli.lightfalling.event
 
 /**
- * Interface for events that can be cancelled.
+ * Interface for events that can be canceled.
  */
 interface Cancellable {
     var isCancelled: Boolean

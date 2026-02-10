@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.lwjgl.glfw.GLFW
 import top.teanli.lightfalling.command.CommandSystem
+import top.teanli.lightfalling.config.ConfigSystem
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.tool.ToolManager
 import top.teanli.lightfalling.ui.clickgui.ClickGUIScreen
@@ -33,18 +34,21 @@ class Lightfalling : ModInitializer {
     override fun onInitialize() {
         log.info("Initializing lightfalling")
         ToolManager.init()
-
         ModuleManager.init()
-        log.info("Module loaded")
+        log.info("Module and ModuleManager loaded")
+        ConfigSystem.load()
+        log.info("Configuration loaded")
         CommandSystem.init()
-        log.info("Command loaded")
+        log.info("Command and CommandSystem loaded")
 
-        ClientTickEvents.END_CLIENT_TICK.register { client ->
-
+        ClientTickEvents.END_CLIENT_TICK.register {
             while (clickGUI.consumeClick()) {
                 Minecraft.getInstance().setScreen(ClickGUIScreen())
             }
         }
-    }
 
+        Runtime.getRuntime().addShutdownHook(Thread {
+            ConfigSystem.save()
+        })
+    }
 }

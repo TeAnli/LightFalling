@@ -53,15 +53,6 @@ abstract class Module(
     override val isEventListenerActive: Boolean
         get() = state
 
-    val onKey = listen<KeyEvent> { event ->
-        if (event.action == GLFW.GLFW_PRESS) {
-            ModuleManager.getModules().forEach { module ->
-                if (module.key != 0 && module.key == event.key) {
-                    module.toggle()
-                }
-            }
-        }
-    }
     /**
      * Toggles the module's enabled state.
      */

@@ -1,9 +1,15 @@
 package top.teanli.lightfalling.module
 
+import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
+import org.lwjgl.glfw.GLFW
 import top.teanli.lightfalling.Lightfalling
 import top.teanli.lightfalling.config.ConfigSystem
+import top.teanli.lightfalling.event.Event
+import top.teanli.lightfalling.event.EventListener
 import top.teanli.lightfalling.event.EventManager
+import top.teanli.lightfalling.event.impl.KeyEvent
+import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.tool.PackageScanner
 
 /**
@@ -11,15 +17,28 @@ import top.teanli.lightfalling.tool.PackageScanner
  * Responsible for automatic scanning, registration, lifecycle management, and querying of modules.
  */
 @Suppress("UNUSED_PARAMETER")
-object ModuleManager {
+object ModuleManager : EventListener {
     private val modules = mutableListOf<Module>()
+
+    override val eventHandlers = mutableListOf<EventListener.EventHandler<out Event>>()
+    override val isEventListenerActive: Boolean = true
+
+    private val onKey = listen<KeyEvent> { event ->
+        if (event.action == GLFW.GLFW_PRESS && Minecraft.getInstance().screen == null) {
+            modules.forEach { module ->
+                if (module.key != 0 && module.key == event.key) {
+                    module.toggle()
+                }
+            }
+        }
+    }
 
     /**
      * Initializes the module manager.
      */
     fun init() {
         scanModules()
-
+        EventManager.subscribe(this)
     }
 
     /**
