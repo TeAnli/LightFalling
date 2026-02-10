@@ -6,15 +6,15 @@
   "mixins": [
   ],
   "client": [
-    "MixinClientConnection",
-    "MixinClientPlayerEntity",
-    "MixinClientPlayerInteractionManager",
-    "MixinInGameHud",
-    "MixinKeyboard",
-    "MixinLevelRenderer",
-    "MixinMinecraftClient",
-    "MixinSimpleOption",
-    "MixinTNTEntityRenderer",
+    "network.MixinClientConnection",
+    "player.MixinClientPlayerEntity",
+    "client.multiplayer.MixinClientPlayerInteractionManager",
+    "client.gui.MixinInGameHud",
+    "client.MixinKeyboard",
+    "client.renderer.MixinLevelRenderer",
+    "client.MixinMinecraftClient",
+    "client.MixinSimpleOption",
+    "client.renderer.MixinTNTEntityRenderer",
     "MixinValidatingIntSliderCallbacks"
   ],
   "injectors": {

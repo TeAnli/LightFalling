@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.mixin;
+package top.teanli.lightfalling.mixin.client.multiplayer;
 
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;

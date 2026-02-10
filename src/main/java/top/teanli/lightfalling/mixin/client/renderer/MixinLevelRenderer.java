@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.mixin;
+package top.teanli.lightfalling.mixin.client.renderer;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
@@ -7,7 +7,6 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.world.entity.vehicle.minecart.Minecart;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,8 +25,6 @@ public class MixinLevelRenderer {
             GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl2, CallbackInfo ci) {
         PoseStack poseStack = new PoseStack();
         poseStack.mulPose(positionMatrix);
-        // Provide a clean PoseStack so modules can handle world-to-view space
-        // themselves
         EventManager.INSTANCE
                 .post(new Render3DEvent(camera, poseStack, Minecraft.getInstance().renderBuffers().bufferSource(), deltaTracker.getGameTimeDeltaPartialTick(false)));
     }

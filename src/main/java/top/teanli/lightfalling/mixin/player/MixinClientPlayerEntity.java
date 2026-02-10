@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.mixin;
+package top.teanli.lightfalling.mixin.player;
 
 import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.mixin;
+package top.teanli.lightfalling.mixin.network;
 
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Connection;

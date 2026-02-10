@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.mixin;
+package top.teanli.lightfalling.mixin.client.gui;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;

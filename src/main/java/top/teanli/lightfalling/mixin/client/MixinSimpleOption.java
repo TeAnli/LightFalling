@@ -1,4 +1,4 @@
-package top.teanli.lightfalling.mixin;
+package top.teanli.lightfalling.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
