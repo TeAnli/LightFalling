@@ -18,8 +18,8 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
     private var selectedCategory: ModuleCategory = ModuleCategory.PLAYER
     private var bindingModule: Module? = null
     private var scrollOffset = 0.0
+    private var isDraggingScrollbar = false
 
-    // Store tab buttons separately to render them outside scissor
     private val tabButtons = mutableListOf<Button>()
 
     override fun init() {
@@ -93,10 +93,16 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         }
     }
 
-    override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
+    private fun getContentHeight(): Int {
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
-        val contentHeight = modules.size * (20 + 5)
-        val viewHeight = height - 100
+        return modules.size * (20 + 5)
+    }
+
+    private fun getViewHeight(): Int = height - 80
+
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
+        val contentHeight = getContentHeight()
+        val viewHeight = getViewHeight()
         
         if (contentHeight > viewHeight) {
             scrollOffset += scrollY * 20
@@ -111,21 +117,34 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         if (bindingModule != null) return false
 
         val centerX = width / 2
-        val modules = ModuleManager.getModulesByCategory(selectedCategory)
         val buttonWidth = 150
         val iconButtonWidth = 25
-        val buttonHeight = 20
         val spacing = 5
         val totalRowWidth = buttonWidth + (spacing + iconButtonWidth) * 2
+        val bgX = centerX - totalRowWidth / 2 - 10
+        val bgW = totalRowWidth + 20
+        
+        // Scrollbar interaction
+        val scrollbarX = bgX + bgW - 6
+        val viewHeight = getViewHeight()
+        val contentHeight = getContentHeight()
+        
+        if (contentHeight > viewHeight && mouseEvent.x >= scrollbarX && mouseEvent.x <= scrollbarX + 4 && mouseEvent.y >= 40 && mouseEvent.y <= 40 + viewHeight) {
+            isDraggingScrollbar = true
+            updateScrollFromMouse(mouseEvent.y)
+            return true
+        }
+
+        val modules = ModuleManager.getModulesByCategory(selectedCategory)
         val startX = centerX - totalRowWidth / 2
         val startY = 50 + scrollOffset.toInt()
 
         modules.forEachIndexed { index, module ->
-            val y = startY + index * (buttonHeight + spacing)
+            val y = startY + index * (20 + spacing)
             val x = startX + iconButtonWidth + spacing
 
             if (y >= 40 && y <= height - 40) {
-                if (mouseEvent.x >= x && mouseEvent.x <= x + buttonWidth && mouseEvent.y >= y && mouseEvent.y <= y + buttonHeight) {
+                if (mouseEvent.x >= x && mouseEvent.x <= x + buttonWidth && mouseEvent.y >= y && mouseEvent.y <= y + 20) {
                     if (mouseEvent.button() == 2) { // Middle Click
                         bindingModule = module
                         refreshLayout()
@@ -136,6 +155,30 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         }
         
         return super.mouseClicked(mouseEvent, bl)
+    }
+
+    override fun mouseReleased(mouseEvent: MouseButtonEvent): Boolean {
+        isDraggingScrollbar = false
+        return super.mouseReleased(mouseEvent)
+    }
+
+    override fun mouseDragged(mouseEvent: MouseButtonEvent, d: Double, e: Double): Boolean {
+        if (isDraggingScrollbar) {
+            updateScrollFromMouse(mouseEvent.y)
+            return true
+        }
+        return super.mouseDragged(mouseEvent, d, e)
+    }
+
+    private fun updateScrollFromMouse(mouseY: Double) {
+        val viewHeight = getViewHeight()
+        val contentHeight = getContentHeight()
+        val trackY = 40
+        
+        val percentage = (mouseY - trackY) / viewHeight
+        val targetOffset = -(percentage * contentHeight - viewHeight / 2)
+        scrollOffset = min(0.0, max(targetOffset, (viewHeight - contentHeight).toDouble()))
+        refreshLayout()
     }
 
     override fun keyPressed(keyEvent: KeyEvent): Boolean {
@@ -153,7 +196,6 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
     }
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-        // 1. Draw main background
         renderTransparentBackground(guiGraphics)
         
         val centerX = width / 2
@@ -173,9 +215,22 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         
         guiGraphics.fill(bgX, bgY, bgX + bgW, bgY + bgH, 0x90000000.toInt())
         
-        // 4. Scissor and render module list
+        // 4. Draw Scrollbar
+        val contentHeight = getContentHeight()
+        val viewHeight = getViewHeight()
+        if (contentHeight > viewHeight) {
+            val scrollbarX = bgX + bgW - 6
+            val scrollbarHeight = max(20.0, (viewHeight.toDouble() / contentHeight) * viewHeight).toInt()
+            val scrollbarY = bgY + ((-scrollOffset / (contentHeight - viewHeight)) * (viewHeight - scrollbarHeight)).toInt()
+            
+            // Track
+            guiGraphics.fill(scrollbarX, bgY, scrollbarX + 4, bgY + bgH, 0x40FFFFFF.toInt())
+            // Thumb
+            guiGraphics.fill(scrollbarX, scrollbarY, scrollbarX + 4, scrollbarY + scrollbarHeight, 0xA0FFFFFF.toInt())
+        }
+        
+        // 5. Scissor and render module list
         guiGraphics.enableScissor(bgX, bgY, bgX + bgW, bgY + bgH)
-        // We only render non-tab widgets here
         children().forEach { 
             if (it is Button && !tabButtons.contains(it)) {
                 it.render(guiGraphics, mouseX, mouseY, partialTick)
@@ -183,7 +238,7 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         }
         guiGraphics.disableScissor()
         
-        // 5. Draw instructions
+        // 6. Draw instructions
         guiGraphics.drawCenteredString(font, "§7Left: Toggle | Right: Bind (on Main) | Icons: Quick Actions", centerX, height - 20, -1)
         
         if (bindingModule != null) {

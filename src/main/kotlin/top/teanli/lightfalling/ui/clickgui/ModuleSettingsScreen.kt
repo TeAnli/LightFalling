@@ -86,6 +86,14 @@ class ModuleSettingsScreen(private val module: Module, private val parent: Scree
         return super.mouseClicked(mouseEvent, bl)
     }
 
+    override fun mouseReleased(mouseEvent: MouseButtonEvent): Boolean {
+        return super.mouseReleased(mouseEvent)
+    }
+
+    override fun mouseDragged(mouseEvent: MouseButtonEvent, d: Double, e: Double): Boolean {
+        return super.mouseDragged(mouseEvent, d, e)
+    }
+
     override fun keyPressed(keyEvent: KeyEvent): Boolean {
         return super.keyPressed(keyEvent)
     }
