@@ -9,7 +9,7 @@ import top.teanli.lightfalling.command.literal
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.tool.MessageTool
 
-object ListCommand : Command("list", "List all modules") {
+class ListCommand : Command("list", "List all modules") {
     override fun build(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
         builder.literal(name) {
             execute {

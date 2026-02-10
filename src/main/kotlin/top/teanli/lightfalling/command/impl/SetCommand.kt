@@ -8,7 +8,7 @@ import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.module.setting.*
 import top.teanli.lightfalling.tool.MessageTool
 
-object SetCommand : Command("set", "Modify module settings") {
+class SetCommand : Command("set", "Modify module settings") {
     override fun build(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
         builder.literal(name) {
             argument("module", word()) {

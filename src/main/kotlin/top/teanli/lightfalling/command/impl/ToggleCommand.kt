@@ -6,7 +6,7 @@ import top.teanli.lightfalling.command.*
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.tool.MessageTool
 
-object ToggleCommand : Command("toggle", "Toggle a module") {
+class ToggleCommand : Command("toggle", "Toggle a module") {
     override fun build(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
         builder.literal(name) {
             argument("module", word()) {
