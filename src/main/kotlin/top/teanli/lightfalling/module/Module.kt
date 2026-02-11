@@ -47,6 +47,11 @@ abstract class Module(
         return ColorSetting(name, defaultValue, rainbow, visibility).also { settings.add(it) }
     }
 
+    protected fun <T : Setting<*>> setting(setting: T): T {
+        settings.add(setting)
+        return setting
+    }
+
     // List of functional event handlers from EventListener
     override val eventHandlers = mutableListOf<EventListener.EventHandler<out Event>>()
 

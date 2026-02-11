@@ -1,5 +1,7 @@
 package top.teanli.lightfalling.module.setting
 
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import java.awt.Color
 import java.util.function.Supplier
 
@@ -44,3 +46,29 @@ class ColorSetting(
     val rainbow: Boolean = false,
     visibility: Supplier<Boolean> = Supplier { true }
 ) : Setting<Color>(name, value, visibility)
+
+class BlockListSetting(
+    name: String,
+    value: MutableSet<Block> = mutableSetOf(),
+    visibility: Supplier<Boolean> = Supplier { true }
+) : Setting<MutableSet<Block>>(name, value, visibility) {
+    fun addBlock(block: Block) {
+        value.add(block)
+    }
+    
+    fun removeBlock(block: Block) {
+        value.remove(block)
+    }
+    
+    fun containsBlock(block: Block): Boolean {
+        return value.contains(block)
+    }
+    
+    fun toggleBlock(block: Block) {
+        if (containsBlock(block)) {
+            removeBlock(block)
+        } else {
+            addBlock(block)
+        }
+    }
+}

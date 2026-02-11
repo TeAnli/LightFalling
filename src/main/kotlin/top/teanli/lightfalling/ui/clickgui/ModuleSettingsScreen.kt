@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.setting.*
 import top.teanli.lightfalling.ui.clickgui.components.ColorPicker
+import top.teanli.lightfalling.ui.clickgui.components.BlockSelector
 import java.awt.Color
 import kotlin.math.pow
 import kotlin.math.round
@@ -142,6 +143,20 @@ class ModuleSettingsScreen(private val module: Module, private val parent: Scree
                     addRenderableWidget(bBox)
 
                     currentY += 25
+                }
+                is BlockListSetting -> {
+                    // Block List Label
+                    addRenderableWidget(
+                        Button.builder(Component.literal(setting.name)) { }
+                            .bounds(centerX - 75, currentY, 150, 20).build().apply { active = false }
+                    )
+                    currentY += 22
+                    
+                    // Block Selector Component
+                    addRenderableWidget(
+                        BlockSelector(centerX - 75, currentY, 150, 150, setting)
+                    )
+                    currentY += 155
                 }
             }
         }
