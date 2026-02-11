@@ -21,7 +21,7 @@ class BlockSelector(
     width: Int,
     height: Int,
     private val setting: BlockListSetting
-) : AbstractWidget(x, y, width, height, Component.literal("Block Selector")) {
+) : AbstractWidget(x, y, width, height, top.teanli.lightfalling.tool.I18n.component("lightfalling.blockselector.title")) {
     
     private val mc = Minecraft.getInstance()
     private var scrollOffset = 0
@@ -54,7 +54,8 @@ class BlockSelector(
         guiGraphics.fill(x + width - 1, y, x + width, y + height, 0xFFFFFFFF.toInt())
         
         // Draw title
-        guiGraphics.drawString(mc.font, "Select Blocks to Mine:", x + 5, y + 5, 0xFFFFFF)
+        val titleText = top.teanli.lightfalling.tool.I18n.translate("lightfalling.blockselector.title")
+        guiGraphics.drawString(mc.font, titleText, x + 5, y + 5, 0xFFFFFF)
         
         // Draw block grid
         val startY = y + 20

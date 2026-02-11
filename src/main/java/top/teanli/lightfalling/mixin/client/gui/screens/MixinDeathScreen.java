@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import top.teanli.lightfalling.module.modules.player.DeathPoint;
+import top.teanli.lightfalling.tool.I18n;
 
 @Mixin(DeathScreen.class)
 public abstract class MixinDeathScreen extends Screen {
@@ -23,14 +24,14 @@ public abstract class MixinDeathScreen extends Screen {
     private void onInit(CallbackInfo ci) {
         BlockPos deathPos = DeathPoint.Companion.getLastDeathPos();
         if (deathPos != null) {
-            String coords = String.format("X: %d, Y: %d, Z: %d", deathPos.getX(), deathPos.getY(), deathPos.getZ());
-            
             // 添加传送按钮
-            this.addRenderableWidget(Button.builder(Component.literal("TP to Death Point"), (button) -> {
-                if (this.minecraft != null && this.minecraft.player != null) {
-                    this.minecraft.player.connection.sendChat("/tp " + deathPos.getX() + " " + deathPos.getY() + " " + deathPos.getZ());
-                }
-            }).bounds(this.width / 2 - 100, this.height / 4 + 120, 200, 20).build());
+            this.addRenderableWidget(
+                    Button.builder(I18n.INSTANCE.component("lightfalling.gui.deathscreen.tp"), (button) -> {
+                        if (this.minecraft != null && this.minecraft.player != null) {
+                            this.minecraft.player.connection
+                                    .sendChat("/tp " + deathPos.getX() + " " + deathPos.getY() + " " + deathPos.getZ());
+                        }
+                    }).bounds(this.width / 2 - 100, this.height / 4 + 120, 200, 20).build());
         }
     }
 
@@ -38,7 +39,8 @@ public abstract class MixinDeathScreen extends Screen {
     private void onRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         BlockPos deathPos = DeathPoint.Companion.getLastDeathPos();
         if (deathPos != null) {
-            String coords = String.format("Death Location: X: %d, Y: %d, Z: %d", deathPos.getX(), deathPos.getY(), deathPos.getZ());
+            String coordsStr = String.format("X: %d, Y: %d, Z: %d", deathPos.getX(), deathPos.getY(), deathPos.getZ());
+            Component coords = I18n.INSTANCE.component("lightfalling.gui.deathscreen.coords", coordsStr);
             guiGraphics.drawCenteredString(this.font, coords, this.width / 2, this.height / 4 + 100, 0xFFFFFF);
         }
     }

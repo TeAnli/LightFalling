@@ -15,9 +15,9 @@ class AutoTool : Module(
     "Automatically switches to the best tool in your hotbar",
     ModuleCategory.PLAYER
 ) {
-    private val switchBack = checkbox("SwitchBack", true)
-    private val onMining = checkbox("Mining", true)
-    private val onAttack = checkbox("Attack", true)
+    private val switchBack = checkbox("switchback", true)
+    private val onMining = checkbox("mining", true)
+    private val onAttack = checkbox("attack", true)
 
     private var lastSlot = -1
 

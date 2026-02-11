@@ -17,11 +17,12 @@ import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.ui.clickgui.components.SettingsButton
+import top.teanli.lightfalling.tool.I18n
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
 
-class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
+class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
     private var selectedCategory: ModuleCategory = ModuleCategory.PLAYER
     private var bindingModule: Module? = null
     private var scrollOffset = 0.0
@@ -35,7 +36,7 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         y: Int,
         width: Int,
         height: Int
-    ) : AbstractButton(x, y, width, height, Component.literal(category.categoryName.uppercase())) {
+    ) : AbstractButton(x, y, width, height, I18n.component("lightfalling.category.${category.categoryName.lowercase()}")) {
         
         override fun onPress(inputWithModifiers: InputWithModifiers) {
             selectedCategory = category
@@ -91,6 +92,13 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         val totalTabsWidth = categories.size * tabWidth + (categories.size - 1) * tabSpacing
         var tabX = centerX - totalTabsWidth / 2
 
+        // 1. 先添加选项卡，确保它们在 children 列表的前面，优先接收点击事件
+        categories.forEach { category ->
+            val tab = CategoryTab(category, tabX, 25, tabWidth, tabHeight)
+            tabButtons.add(tab)
+            addRenderableWidget(tab)
+            tabX += tabWidth + tabSpacing
+        }
 
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
         val listWidth = 300
@@ -104,6 +112,7 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         
         var currentY = 50 + scrollOffset.toInt()
 
+        // 2. 添加模块相关按钮
         modules.forEach { module ->
             val stateColor = if (module.state) "§a" else "§7"
             val bindingText = if (bindingModule == module) "§b[...]" else if (module.key != 0) " §8[${GLFW.glfwGetKeyName(module.key, 0)?.uppercase() ?: module.key}]" else ""
@@ -114,27 +123,20 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
             }.bounds(startX, currentY, toggleWidth, buttonHeight).build()
             addRenderableWidget(toggleBtn)
 
-            val moduleButton = Button.builder(Component.literal("$stateColor${module.name}$bindingText")) { _ ->
+            val moduleButton = Button.builder(Component.literal("$stateColor${module.getDisplayName()}$bindingText")) { _ ->
                 if (bindingModule == null) {
                     module.toggle()
                     refreshLayout()
                 }
             }.bounds(startX + toggleWidth + rowSpacing, currentY, mainBtnWidth, buttonHeight).build()
             
-            moduleButton.setTooltip(Tooltip.create(Component.literal(module.description)))
+            moduleButton.setTooltip(Tooltip.create(Component.literal(module.getDisplayDescription())))
             addRenderableWidget(moduleButton)
 
             val settingsBtn = SettingsButton(module, startX + toggleWidth + mainBtnWidth + rowSpacing * 2, currentY, settingsWidth, buttonHeight, this)
             addRenderableWidget(settingsBtn)
             
             currentY += buttonHeight + rowSpacing
-        }
-
-        categories.forEach { category ->
-            val tab = CategoryTab(category, tabX, 25, tabWidth, tabHeight)
-            tabButtons.add(tab)
-            addRenderableWidget(tab)
-            tabX += tabWidth + tabSpacing
         }
     }
 
@@ -143,9 +145,16 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         return modules.size * (24 + 6) + 10
     }
 
-    private fun getViewHeight(): Int = height - 100
+    private fun getViewHeight(): Int = height - 90 // 与渲染区域 bgH 保持一致
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
+        // 只有在列表区域内才响应滚动
+        val centerX = width / 2
+        val listWidth = 320
+        if (mouseX < centerX - listWidth / 2 || mouseX > centerX + listWidth / 2 || mouseY < 45 || mouseY > height - 45) {
+            return false
+        }
+
         val contentHeight = getContentHeight()
         val viewHeight = getViewHeight()
         
@@ -165,17 +174,34 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         val listWidth = 320
         val bgX = centerX - listWidth / 2
         val bgW = listWidth
+        val bgY = 45
+        val bgH = height - 90
         
+        // 1. 优先检查选项卡点击
+        for (tab in tabButtons) {
+            if (tab.isMouseOver(mouseEvent.x, mouseEvent.y)) {
+                return tab.mouseClicked(mouseEvent, bl)
+            }
+        }
+
+        // 2. 检查滚动条点击
         val scrollbarX = bgX + bgW - 8
-        val viewHeight = getViewHeight()
         val contentHeight = getContentHeight()
+        val viewHeight = getViewHeight()
         
-        if (contentHeight > viewHeight && mouseEvent.x >= scrollbarX && mouseEvent.x <= scrollbarX + 6 && mouseEvent.y >= 45 && mouseEvent.y <= 45 + viewHeight) {
+        if (contentHeight > viewHeight && mouseEvent.x >= scrollbarX && mouseEvent.x <= scrollbarX + 6 && mouseEvent.y >= bgY && mouseEvent.y <= bgY + viewHeight) {
             isDraggingScrollbar = true
             updateScrollFromMouse(mouseEvent.y)
             return true
         }
 
+        // 3. 检查模块列表区域内的点击
+        // 如果点击位置不在裁剪区域内，直接拦截，不向下传递给模块按钮
+        if (mouseEvent.x < bgX || mouseEvent.x > bgX + bgW || mouseEvent.y < bgY || mouseEvent.y > bgY + bgH) {
+            return false
+        }
+
+        // 处理中键绑定逻辑
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
         val startX = centerX - 300 / 2
         val toggleWidth = 40
@@ -187,13 +213,11 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
             val x = startX + toggleWidth + rowSpacing
             val mainBtnWidth = 300 - 40 - 25 - (6 * 2)
 
-            if (y >= 45 && y <= height - 55) {
-                if (mouseEvent.x >= x && mouseEvent.x <= x + mainBtnWidth && mouseEvent.y >= y && mouseEvent.y <= y + 24) {
-                    if (mouseEvent.button() == 2) {
-                        bindingModule = module
-                        refreshLayout()
-                        return true
-                    }
+            if (mouseEvent.x >= x && mouseEvent.x <= x + mainBtnWidth && mouseEvent.y >= y && mouseEvent.y <= y + 24) {
+                if (mouseEvent.button() == 2) {
+                    bindingModule = module
+                    refreshLayout()
+                    return true
                 }
             }
         }
@@ -294,7 +318,8 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         
         // 4. 裁剪并渲染模块列表
         guiGraphics.enableScissor(bgX, bgY, bgX + bgW, bgY + bgH)
-        children().forEach { 
+        children().forEach {
+            // 只渲染模块相关的按钮（即不在 tabButtons 中的按钮）
             if (it is Button) {
                 it.render(guiGraphics, mouseX, mouseY, partialTick)
             }
@@ -302,13 +327,13 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         guiGraphics.disableScissor()
         
         val hintY = height - 30
-        guiGraphics.drawCenteredString(font, "§7Middle-Click on Module to Bind Key", centerX, hintY, -1)
-        guiGraphics.drawCenteredString(font, "§8LightFalling Client", centerX, hintY + 12, -1)
+        guiGraphics.drawCenteredString(font, I18n.translate("lightfalling.gui.clickgui.hint.bind"), centerX, hintY, -1)
+        guiGraphics.drawCenteredString(font, I18n.translate("lightfalling.gui.clickgui.footer"), centerX, hintY + 12, -1)
         
         if (bindingModule != null) {
             guiGraphics.fill(0, 0, width, height, 0xCC000000.toInt())
-            guiGraphics.drawCenteredString(font, "Binding Key for §b${bindingModule?.name}", centerX, height / 2 - 10, -1)
-            guiGraphics.drawCenteredString(font, "§7Press any key... (ESC to clear)", centerX, height / 2 + 10, -1)
+            guiGraphics.drawCenteredString(font, I18n.translate("lightfalling.gui.clickgui.binding.title", bindingModule?.getDisplayName() ?: ""), centerX, height / 2 - 10, -1)
+            guiGraphics.drawCenteredString(font, I18n.translate("lightfalling.gui.clickgui.binding.hint"), centerX, height / 2 + 10, -1)
         }
     }
 

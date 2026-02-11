@@ -5,7 +5,7 @@ import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 
 object CustomFOV : Module("CustomFOV", "Customize your field of view", ModuleCategory.PLAYER) {
-    val fov = slider("FOV", 110.0, 30.0, 160.0, 0)
+    val fov = slider("fov", 110.0, 30.0, 160.0, 0)
 
     override fun onEnable() {
         val mc = Minecraft.getInstance()

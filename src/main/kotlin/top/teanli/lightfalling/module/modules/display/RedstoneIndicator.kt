@@ -24,11 +24,11 @@ class RedstoneIndicator : Module(
     "Displays redstone signal strength of the block you're looking at",
     ModuleCategory.DISPLAY
 ) {
-    private val show2D = checkbox("Show 2D Info", true)
-    private val show3D = checkbox("Show 3D Boxes", true)
-    private val showAllSides = checkbox("Show All Sides", false)
-    private val scanRange = slider("Scan Range", 16.0, 4.0, 32.0, 0)
-    private val shadow = checkbox("Shadow", true)
+    private val show2D = checkbox("show2d", true)
+    private val show3D = checkbox("show3d", true)
+    private val showAllSides = checkbox("showallsides", false)
+    private val scanRange = slider("scanrange", 16.0, 4.0, 32.0, 0)
+    private val shadow = checkbox("shadow", true)
 
     // List of redstone-related blocks
     private fun isRedstoneBlock(block: Block): Boolean {

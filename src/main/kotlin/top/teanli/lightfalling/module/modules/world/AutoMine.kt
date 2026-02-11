@@ -15,10 +15,10 @@ class AutoMine : Module(
     "Automatically mines the block you are looking at",
     ModuleCategory.WORLD
 ) {
-    private val range = slider("Range", 4.5, 1.0, 6.0, 1)
+    private val range = slider("range", 4.5, 1.0, 6.0, 1)
     
     private val blockList = setting(BlockListSetting(
-        "Target Blocks",
+        "targetblocks",
         mutableSetOf(
             Blocks.STONE,
             Blocks.DEEPSLATE,
@@ -32,11 +32,12 @@ class AutoMine : Module(
             Blocks.DEEPSLATE_GOLD_ORE,
             Blocks.DEEPSLATE_DIAMOND_ORE,
             Blocks.DEEPSLATE_EMERALD_ORE
-        )
+        ),
+        moduleName = "AutoMine"
     ))
     
-    private val mineAll = checkbox("Mine All Blocks", false)
-    private val checkTool = checkbox("Check Tool Efficiency", true)
+    private val mineAll = checkbox("mineall", false)
+    private val checkTool = checkbox("checktool", true)
 
     private val onTick = listen<TickEvent> {
         if (mc.screen != null) return@listen

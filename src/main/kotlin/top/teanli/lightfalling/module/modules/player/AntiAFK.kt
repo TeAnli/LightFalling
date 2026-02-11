@@ -11,8 +11,8 @@ import kotlin.math.sin
 
 class AntiAFK : Module("AntiAFK", "Prevents you from being kicked for being AFK", ModuleCategory.PLAYER) {
 
-    private val mode = mode("Mode", "Rotate", listOf("Rotate", "Jump", "Move"))
-    private val delay = slider("Delay", 5.0, 1.0, 60.0, 1) // Seconds
+    private val mode = mode("mode", "Rotate", listOf("Rotate", "Jump", "Move"))
+    private val delay = slider("delay", 5.0, 1.0, 60.0, 1) // Seconds
     
     private val random = Random()
     private var lastActionTime = 0L

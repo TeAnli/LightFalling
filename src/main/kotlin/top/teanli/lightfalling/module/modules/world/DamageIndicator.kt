@@ -16,7 +16,7 @@ import kotlin.math.pow
 
 class DamageIndicator : Module(
     "DamageIndicator",
-    "shows floating damage numbers above entities.",
+    "Shows floating damage numbers above entities.",
     ModuleCategory.WORLD
 ) {
     private val lifeTime = slider("duration", 1000.0, 500.0, 3000.0, 0)

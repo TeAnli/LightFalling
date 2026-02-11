@@ -14,7 +14,7 @@ class ColorPicker(
     width: Int,
     height: Int,
     private val setting: ColorSetting
-) : AbstractWidget(x, y, width, height, Component.literal(setting.name)) {
+) : AbstractWidget(x, y, width, height, Component.literal(setting.getDisplayName())) {
 
     private var hue = 0f
     private var saturation = 0f

@@ -18,13 +18,15 @@ import top.teanli.lightfalling.ui.clickgui.ClickGUIScreen
 
 class Lightfalling : ModInitializer {
     companion object{
+        const val MOD_ID = "lightfalling"
+        const val MOD_NAME = "LightFalling"
         val log: Logger = LogManager.getLogger("Lightfalling")
     }
 
-    var category: KeyMapping.Category = KeyMapping.Category(Identifier.fromNamespaceAndPath("", ""))
-    var clickGUI = KeyBindingHelper.registerKeyBinding(
+    var category: KeyMapping.Category = KeyMapping.Category(Identifier.fromNamespaceAndPath(MOD_ID, "category"))
+    var gui: KeyMapping? = KeyBindingHelper.registerKeyBinding(
         KeyMapping(
-            "key.lightfalling.clickgui",
+            "key.lightfalling.gui",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_RIGHT_SHIFT,
             category
@@ -42,7 +44,7 @@ class Lightfalling : ModInitializer {
         log.info("Command and CommandSystem loaded")
 
         ClientTickEvents.END_CLIENT_TICK.register {
-            while (clickGUI.consumeClick()) {
+            while (gui!!.consumeClick()) {
                 Minecraft.getInstance().setScreen(ClickGUIScreen())
             }
         }

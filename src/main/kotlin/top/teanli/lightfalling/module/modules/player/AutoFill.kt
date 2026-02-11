@@ -9,8 +9,8 @@ import top.teanli.lightfalling.module.ModuleCategory
 
 class AutoFill : Module("AutoFill", "Automatically refills items in your hotbar", ModuleCategory.PLAYER) {
 
-    private val threshold = slider("Threshold", 8.0, 1.0, 64.0, 0)
-    private val tickDelay = slider("TickDelay", 2.0, 1.0, 20.0, 0)
+    private val threshold = slider("threshold", 8.0, 1.0, 64.0, 0)
+    private val tickDelay = slider("tickdelay", 2.0, 1.0, 20.0, 0)
     
     private var delayTimer = 0
 

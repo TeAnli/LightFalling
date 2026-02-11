@@ -10,14 +10,14 @@ import java.util.Random
 
 class AutoClicker : Module("AutoClicker", "Automatically clicks for you", ModuleCategory.PLAYER) {
 
-    private val minCps = slider("MinCPS", 8.0, 1.0, 20.0, 1)
-    private val maxCps = slider("MaxCPS", 12.0, 1.0, 20.0, 1)
-    private val jitter = slider("Jitter", 0.0, 0.0, 4.0, 1)
-    private val onlyWeapon = checkbox("OnlyWeapon", false)
-    private val leftClick = checkbox("LeftClick", true)
-    private val rightClick = checkbox("RightClick", false)
-    private val holdToClick = checkbox("HoldToClick", true)
-    private val dropClickChance = slider("DropChance", 0.05, 0.0, 0.2, 2)
+    private val minCps = slider("mincps", 8.0, 1.0, 20.0, 1)
+    private val maxCps = slider("maxcps", 12.0, 1.0, 20.0, 1)
+    private val jitter = slider("jitter", 0.0, 0.0, 4.0, 1)
+    private val onlyWeapon = checkbox("onlyweapon", false)
+    private val leftClick = checkbox("leftclick", true)
+    private val rightClick = checkbox("rightclick", false)
+    private val holdToClick = checkbox("holdtoclick", true)
+    private val dropClickChance = slider("dropchance", 0.05, 0.0, 0.2, 2)
 
     private val random = Random()
     private var nextLeftClick = 0L

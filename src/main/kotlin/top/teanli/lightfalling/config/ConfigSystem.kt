@@ -98,6 +98,7 @@ object ConfigSystem {
                                 }
                             }
                             is ColorSetting -> setting.value = java.awt.Color(settingElement.asInt, true)
+
                         }
                     } catch (e: Exception) {
                         // Skip invalid settings

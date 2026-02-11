@@ -13,11 +13,12 @@ import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.setting.*
 import top.teanli.lightfalling.ui.clickgui.components.ColorPicker
 import top.teanli.lightfalling.ui.clickgui.components.BlockSelector
+import top.teanli.lightfalling.tool.I18n
 import java.awt.Color
 import kotlin.math.pow
 import kotlin.math.round
 
-class ModuleSettingsScreen(private val module: Module, private val parent: Screen) : Screen(Component.literal("Settings: ${module.name}")) {
+class ModuleSettingsScreen(private val module: Module, private val parent: Screen) : Screen(I18n.component("lightfalling.gui.settings")) {
     
     override fun init() {
         refreshLayout()
@@ -30,14 +31,14 @@ class ModuleSettingsScreen(private val module: Module, private val parent: Scree
 
         // Back button
         addRenderableWidget(
-            Button.builder(Component.literal("Back")) {
+            Button.builder(I18n.component("lightfalling.gui.back")) {
                 minecraft?.setScreen(parent)
             }.bounds(10, 10, 60, 20).build()
         )
 
         // Module Title
         addRenderableWidget(
-            Button.builder(Component.literal("Settings: ${module.name}")) { }
+            Button.builder(Component.literal("${I18n.translate("lightfalling.gui.settings")}: ${module.getDisplayName()}")) { }
                 .bounds(centerX - 100, 20, 200, 20).build().apply {
                 active = false
             }
@@ -49,7 +50,7 @@ class ModuleSettingsScreen(private val module: Module, private val parent: Scree
             when (setting) {
                 is BooleanSetting -> {
                     addRenderableWidget(
-                        Checkbox.builder(Component.literal(setting.name), font)
+                        Checkbox.builder(Component.literal(setting.getDisplayName()), font)
                             .pos(centerX - 75, currentY)
                             .selected(setting.value)
                             .onValueChange { _, value -> setting.value = value }
@@ -59,9 +60,9 @@ class ModuleSettingsScreen(private val module: Module, private val parent: Scree
                 }
                 is NumberSetting -> {
                     addRenderableWidget(
-                        object : AbstractSliderButton(centerX - 75, currentY, 150, 20, Component.literal("${setting.name}: ${setting.value}"), ((setting.value - setting.min) / (setting.max - setting.min))) {
+                        object : AbstractSliderButton(centerX - 75, currentY, 150, 20, Component.literal("${setting.getDisplayName()}: ${setting.value}"), ((setting.value - setting.min) / (setting.max - setting.min))) {
                             override fun updateMessage() {
-                                message = Component.literal("${setting.name}: ${setting.value}")
+                                message = Component.literal("${setting.getDisplayName()}: ${setting.value}")
                             }
 
                             override fun applyValue() {
@@ -75,9 +76,9 @@ class ModuleSettingsScreen(private val module: Module, private val parent: Scree
                 }
                 is ModeSetting -> {
                     addRenderableWidget(
-                        Button.builder(Component.literal("${setting.name}: ${setting.value}")) { button ->
+                        Button.builder(Component.literal("${setting.getDisplayName()}: ${setting.getModeDisplayName()}")) { button ->
                             setting.nextMode()
-                            button.message = Component.literal("${setting.name}: ${setting.value}")
+                            button.message = Component.literal("${setting.getDisplayName()}: ${setting.getModeDisplayName()}")
                         }.bounds(centerX - 75, currentY, 150, 20).build()
                     )
                     currentY += 25
@@ -85,7 +86,7 @@ class ModuleSettingsScreen(private val module: Module, private val parent: Scree
                 is ColorSetting -> {
                     // Color Label
                     addRenderableWidget(
-                        Button.builder(Component.literal(setting.name)) { }
+                        Button.builder(Component.literal(setting.getDisplayName())) { }
                             .bounds(centerX - 75, currentY, 150, 20).build().apply { active = false }
                     )
                     currentY += 22

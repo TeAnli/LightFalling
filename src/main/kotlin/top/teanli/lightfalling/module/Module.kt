@@ -10,6 +10,7 @@ import top.teanli.lightfalling.event.impl.KeyEvent
 import top.teanli.lightfalling.event.listen
 import top.teanli.lightfalling.module.setting.*
 import top.teanli.lightfalling.tool.MessageTool
+import top.teanli.lightfalling.tool.I18n
 import java.awt.Color
 import java.util.function.Supplier
 
@@ -28,26 +29,45 @@ abstract class Module(
         private set
 
     val settings = mutableListOf<Setting<*>>()
+    
+    /**
+     * Get translated module name
+     */
+    fun getDisplayName(): String {
+        return I18n.translateModule(name)
+    }
+    
+    /**
+     * Get translated module description
+     */
+    fun getDisplayDescription(): String {
+        return I18n.translateModuleDesc(name, description)
+    }
+    
     /**
      * Creation helpers for settings
      */
     protected fun checkbox(name: String, defaultValue: Boolean, visibility: Supplier<Boolean> = Supplier { true }): BooleanSetting {
-        return BooleanSetting(name, defaultValue, visibility).also { settings.add(it) }
+        return BooleanSetting(name, defaultValue, visibility, this.name).also { settings.add(it) }
     }
 
     protected fun slider(name: String, defaultValue: Double, min: Double, max: Double, precision: Int = 1, visibility: Supplier<Boolean> = Supplier { true }): NumberSetting {
-        return NumberSetting(name, defaultValue, min, max, precision, visibility).also { settings.add(it) }
+        return NumberSetting(name, defaultValue, min, max, precision, visibility, this.name).also { settings.add(it) }
     }
 
     protected fun mode(name: String, defaultValue: String, modes: List<String>, visibility: Supplier<Boolean> = Supplier { true }): ModeSetting {
-        return ModeSetting(name, defaultValue, modes, visibility).also { settings.add(it) }
+        return ModeSetting(name, defaultValue, modes, visibility, this.name).also { settings.add(it) }
     }
 
     protected fun color(name: String, defaultValue: Color, rainbow: Boolean = false, visibility: Supplier<Boolean> = Supplier { true }): ColorSetting {
-        return ColorSetting(name, defaultValue, rainbow, visibility).also { settings.add(it) }
+        return ColorSetting(name, defaultValue, rainbow, visibility, this.name).also { settings.add(it) }
     }
 
     protected fun <T : Setting<*>> setting(setting: T): T {
+        if (setting is Setting<*> && setting.moduleName == null) {
+            // Since moduleName is val in Setting, we might need to handle this differently if we can't re-instantiate
+            // For BlockListSetting which is passed directly, we'll check its constructor
+        }
         settings.add(setting)
         return setting
     }
@@ -76,7 +96,8 @@ abstract class Module(
         if (!state) {
             state = true
             onEnable()
-            MessageTool.sendRaw("Enabled ${ChatFormatting.GREEN}$name")
+            val displayName = getDisplayName()
+            MessageTool.sendRaw(I18n.translate("lightfalling.message.enabled", "${ChatFormatting.GREEN}$displayName"))
         }
     }
 
@@ -87,7 +108,8 @@ abstract class Module(
         if (state) {
             state = false
             onDisable()
-            MessageTool.sendRaw("Disabled ${ChatFormatting.RED}$name")
+            val displayName = getDisplayName()
+            MessageTool.sendRaw(I18n.translate("lightfalling.message.disabled", "${ChatFormatting.RED}$displayName"))
         }
     }
 

@@ -9,8 +9,8 @@ import top.teanli.lightfalling.module.ModuleCategory
 
 object BrightnessChanger : Module("BrightnessChanger", "Modifies the game brightness (Gamma)", ModuleCategory.PLAYER) {
 
-    val mode = mode("Mode", "Gamma", listOf("Gamma", "Potion"))
-    val brightness = slider("Brightness", 10.0, 1.0, 20.0, 1) { mode.value == "Gamma" }
+    val mode = mode("mode", "Gamma", listOf("Gamma", "Potion"))
+    val brightness = slider("brightness", 10.0, 1.0, 20.0, 1) { mode.value == "Gamma" }
 
     private val nightVision = listen<TickEvent> {
         val player = mc.player ?: return@listen

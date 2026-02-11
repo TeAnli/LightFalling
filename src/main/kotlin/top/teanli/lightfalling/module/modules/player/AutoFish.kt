@@ -13,9 +13,9 @@ import top.teanli.lightfalling.module.ModuleCategory
 @Suppress("UNUSED_PARAMETER")
 object AutoFish : Module("AutoFish", "Automatically catches fish for you", ModuleCategory.PLAYER) {
 
-    private val castDelay = slider("Cast Delay", 15.0, 5.0, 50.0, 0)
-    private val reactionDelay = slider("Reaction Delay", 0.0, 0.0, 10.0, 0)
-    private val variation = slider("Variation", 5.0, 0.0, 20.0, 0)
+    private val castDelay = slider("cast_delay", 15.0, 5.0, 50.0, 0)
+    private val reactionDelay = slider("reaction_delay", 0.0, 0.0, 10.0, 0)
+    private val variation = slider("variation", 5.0, 0.0, 20.0, 0)
 
     private var tickCounter = -1
     private var reelState = State.NONE
