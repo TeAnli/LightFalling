@@ -4,16 +4,19 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.AbstractButton
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.Tooltip
+import net.minecraft.client.gui.components.WidgetTooltipHolder
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.InputWithModifiers
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import org.lwjgl.glfw.GLFW
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
 import top.teanli.lightfalling.module.ModuleManager
+import top.teanli.lightfalling.ui.clickgui.components.SettingsButton
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
@@ -81,7 +84,6 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         tabButtons.clear()
         val centerX = width / 2
         
-        // --- 自定义选项卡布局 ---
         val categories = ModuleCategory.entries
         val tabWidth = 70
         val tabHeight = 20
@@ -90,7 +92,6 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
         var tabX = centerX - totalTabsWidth / 2
 
 
-        // --- 模块列表布局 ---
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
         val listWidth = 300
         val buttonHeight = 24
@@ -123,11 +124,7 @@ class ClickGUIScreen : Screen(Component.literal("LightFalling ClickGUI")) {
             moduleButton.setTooltip(Tooltip.create(Component.literal(module.description)))
             addRenderableWidget(moduleButton)
 
-            val settingsBtn = Button.builder(Component.literal("⚙")) { _ ->
-                minecraft?.setScreen(ModuleSettingsScreen(module, this))
-            }.bounds(startX + toggleWidth + mainBtnWidth + rowSpacing * 2, currentY, settingsWidth, buttonHeight).build().apply {
-                setTooltip(Tooltip.create(Component.literal("Configure ${module.name}")))
-            }
+            val settingsBtn = SettingsButton(module, startX + toggleWidth + mainBtnWidth + rowSpacing * 2, currentY, settingsWidth, buttonHeight, this)
             addRenderableWidget(settingsBtn)
             
             currentY += buttonHeight + rowSpacing
