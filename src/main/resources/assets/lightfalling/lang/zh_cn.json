@@ -23,8 +23,26 @@
   "lightfalling.module.redstoneindicator.scanrange": "扫描范围",
   "lightfalling.module.redstoneindicator.shadow": "阴影",
   
+  "lightfalling.module.cropgrowthindicator": "农作物生长显示器",
+  "lightfalling.module.cropgrowthindicator.desc": "显示你正在看的农作物的生长状态",
+  "lightfalling.module.cropgrowthindicator.show2d": "显示2D信息",
+  "lightfalling.module.cropgrowthindicator.show3d": "显示3D文字",
+  "lightfalling.module.cropgrowthindicator.scanrange": "扫描范围",
+  "lightfalling.module.cropgrowthindicator.shadow": "阴影",
+  "lightfalling.module.cropgrowthindicator.showpercentage": "显示百分比",
+  
   "lightfalling.module.hud": "HUD显示",
   "lightfalling.module.hud.desc": "显示玩家状态信息",
+  
+  "lightfalling.module.healthdisplay": "生物血量显示",
+  "lightfalling.module.healthdisplay.desc": "在生物头顶显示血量",
+  "lightfalling.module.healthdisplay.showplayers": "显示玩家",
+  "lightfalling.module.healthdisplay.showmobs": "显示怪物",
+  "lightfalling.module.healthdisplay.showanimals": "显示动物",
+  "lightfalling.module.healthdisplay.showpercentage": "显示百分比",
+  "lightfalling.module.healthdisplay.showhearts": "显示爱心",
+  "lightfalling.module.healthdisplay.onlyvisible": "仅可见实体",
+  "lightfalling.module.healthdisplay.scanrange": "扫描范围",
   "lightfalling.module.hud.flying": "飞行",
   "lightfalling.module.hud.sneaking": "潜行",
   "lightfalling.module.hud.sprinting": "疾跑",
@@ -118,6 +136,12 @@
 
   "lightfalling.module.tnttimer": "TNT 计时器",
   "lightfalling.module.tnttimer.desc": "显示 TNT 爆炸的剩余倒计时",
+
+  "lightfalling.module.explosivetimer": "爆炸物计时器",
+  "lightfalling.module.explosivetimer.desc": "显示TNT和苦力怕的爆炸倒计时",
+  "lightfalling.module.explosivetimer.showtnt": "显示TNT",
+  "lightfalling.module.explosivetimer.showcreeper": "显示苦力怕",
+  "lightfalling.module.explosivetimer.scanrange": "扫描范围",
 
   "lightfalling.gui.deathscreen.coords": "死亡坐标: %s",
   "lightfalling.gui.deathscreen.tp": "传送到死亡点",

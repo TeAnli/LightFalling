@@ -26,8 +26,26 @@
   "lightfalling.module.redstoneindicator.scanrange": "Scan Range",
   "lightfalling.module.redstoneindicator.shadow": "Shadow",
   
+  "lightfalling.module.cropgrowthindicator": "Crop Growth Indicator",
+  "lightfalling.module.cropgrowthindicator.desc": "Displays growth stage of crops you're looking at",
+  "lightfalling.module.cropgrowthindicator.show2d": "Show 2D Info",
+  "lightfalling.module.cropgrowthindicator.show3d": "Show 3D Text",
+  "lightfalling.module.cropgrowthindicator.scanrange": "Scan Range",
+  "lightfalling.module.cropgrowthindicator.shadow": "Shadow",
+  "lightfalling.module.cropgrowthindicator.showpercentage": "Show Percentage",
+  
   "lightfalling.module.hud": "HUD",
   "lightfalling.module.hud.desc": "Displays player status information",
+  
+  "lightfalling.module.healthdisplay": "Health Display",
+  "lightfalling.module.healthdisplay.desc": "Displays health above entities",
+  "lightfalling.module.healthdisplay.showplayers": "Show Players",
+  "lightfalling.module.healthdisplay.showmobs": "Show Mobs",
+  "lightfalling.module.healthdisplay.showanimals": "Show Animals",
+  "lightfalling.module.healthdisplay.showpercentage": "Show Percentage",
+  "lightfalling.module.healthdisplay.showhearts": "Show Hearts",
+  "lightfalling.module.healthdisplay.onlyvisible": "Only Visible",
+  "lightfalling.module.healthdisplay.scanrange": "Scan Range",
   "lightfalling.module.hud.flying": "Flying",
   "lightfalling.module.hud.sneaking": "Sneaking",
   "lightfalling.module.hud.sprinting": "Sprinting",
@@ -121,6 +139,12 @@
 
   "lightfalling.module.tnttimer": "TNTTimer",
   "lightfalling.module.tnttimer.desc": "Shows a timer for TNT explosions",
+
+  "lightfalling.module.explosivetimer": "Explosive Timer",
+  "lightfalling.module.explosivetimer.desc": "Shows explosion timer for TNT and creepers",
+  "lightfalling.module.explosivetimer.showtnt": "Show TNT",
+  "lightfalling.module.explosivetimer.showcreeper": "Show Creeper",
+  "lightfalling.module.explosivetimer.scanrange": "Scan Range",
 
   "lightfalling.gui.deathscreen.coords": "Death Coords: %s",
   "lightfalling.gui.deathscreen.tp": "Teleport to Death Point",
