@@ -1,13 +1,14 @@
 package top.teanli.lightfalling.tool
 
 import net.minecraft.network.protocol.game.ServerboundClientTickEndPacket
+import top.teanli.lightfalling.event.Event
 import top.teanli.lightfalling.event.EventListener
 import top.teanli.lightfalling.event.impl.PacketEvent
 import top.teanli.lightfalling.event.listen
 import kotlin.math.min
 
 object TickRateTool : EventListener {
-    override val eventHandlers = mutableListOf<EventListener.EventHandler<out top.teanli.lightfalling.event.Event>>()
+    override val eventHandlers = mutableListOf<EventListener.EventHandler<out Event>>()
     
     private var lastPacketTime = -1L
     private val tickRates = FloatArray(20)

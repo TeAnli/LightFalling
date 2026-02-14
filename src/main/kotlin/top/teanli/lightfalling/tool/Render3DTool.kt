@@ -16,7 +16,7 @@ object Render3DTool {
 
     /**
      * Renders text in 3D world space at the specified position
-     * 
+     *
      * @param poseStack The pose stack for transformations
      * @param buffer The buffer source for rendering
      * @param cameraPos The camera position
@@ -26,7 +26,6 @@ object Render3DTool {
      * @param text The text to render
      * @param color The color of the text (RGB)
      * @param scale Base scale factor (default: 0.025f)
-     * @param distanceScale Whether to scale based on distance (default: false)
      * @param displayMode Font display mode (default: SEE_THROUGH)
      * @param shadow Whether to render shadow (default: true)
      */
@@ -40,7 +39,6 @@ object Render3DTool {
         text: String,
         color: Int,
         scale: Float = 0.025f,
-        distanceScale: Boolean = false,
         displayMode: Font.DisplayMode = Font.DisplayMode.SEE_THROUGH,
         shadow: Boolean = true
     ) {
@@ -57,15 +55,7 @@ object Render3DTool {
         poseStack.translate(relX, relY, relZ)
         poseStack.mulPose(camera.rotation())
 
-        // Calculate scale
-        val finalScale = if (distanceScale) {
-            val distance = Math.sqrt(relX * relX + relY * relY + relZ * relZ).toFloat()
-            scale * Math.max(1.0f, distance * 0.15f)
-        } else {
-            scale
-        }
-        
-        poseStack.scale(finalScale, -finalScale, finalScale)
+        poseStack.scale(scale, -scale, scale)
 
         // Calculate text width for centering
         val width = font.width(text)
@@ -101,10 +91,9 @@ object Render3DTool {
         text: String,
         color: Color,
         scale: Float = 0.025f,
-        distanceScale: Boolean = false,
         displayMode: Font.DisplayMode = Font.DisplayMode.SEE_THROUGH,
         shadow: Boolean = true
     ) {
-        renderText3D(poseStack, buffer, cameraPos, x, y, z, text, color.rgb, scale, distanceScale, displayMode, shadow)
+        renderText3D(poseStack, buffer, cameraPos, x, y, z, text, color.rgb, scale, displayMode, shadow)
     }
 }

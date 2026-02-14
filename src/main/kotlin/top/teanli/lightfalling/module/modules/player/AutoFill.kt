@@ -34,7 +34,7 @@ class AutoFill : Module("AutoFill", "Automatically refills items in your hotbar"
                 val targetItem = if (stack.isEmpty) null else stack.item
 
                 // Look for matching item in main inventory (9-35)
-                val replacementSlot = findReplacement(targetItem, i)
+                val replacementSlot = findReplacement(targetItem)
 
                 if (replacementSlot != -1) {
                     fillSlot(replacementSlot, i)
@@ -50,7 +50,7 @@ class AutoFill : Module("AutoFill", "Automatically refills items in your hotbar"
      * If targetItem is null, it might be harder to guess what the user wants, 
      * but usually AutoFill is used when an item just ran out.
      */
-    private fun findReplacement(targetItem: Item?, hotbarSlot: Int): Int {
+    private fun findReplacement(targetItem: Item?): Int {
         val inventory = mc.player?.inventory ?: return -1
         
         // If we know what item was there, look for the same item

@@ -2,6 +2,7 @@ package top.teanli.lightfalling.command.impl
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import top.teanli.lightfalling.Lightfalling
 import top.teanli.lightfalling.command.Command
 import top.teanli.lightfalling.command.argument
 import top.teanli.lightfalling.command.execute
@@ -34,6 +35,7 @@ class KeyCommand : Command("key", "Manage module keybinds") {
                                     field.getInt(null)
                                 } catch (e: Exception) {
                                     MessageTool.error("Invalid key name: $keyName")
+                                    Lightfalling.log.error(e)
                                     return@execute 1
                                 }
                             }

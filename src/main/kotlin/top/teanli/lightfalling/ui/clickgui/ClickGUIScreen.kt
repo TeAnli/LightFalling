@@ -4,14 +4,12 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.AbstractButton
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.Tooltip
-import net.minecraft.client.gui.components.WidgetTooltipHolder
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.InputWithModifiers
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.Identifier
 import org.lwjgl.glfw.GLFW
 import top.teanli.lightfalling.module.Module
 import top.teanli.lightfalling.module.ModuleCategory
@@ -63,8 +61,6 @@ class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
             }else{
                 guiGraphics.fill(x + (width / 2) - 10, renderY + renderHeight - 1, x + (width / 2) + 10, renderY + renderHeight, -1)
             }
-
-            // 绘制文字 - 使用 drawCenteredString 确保渲染
             val textX = x + width / 2
             val textY = renderY + (renderHeight - 8) / 2
             guiGraphics.drawCenteredString(font, message, textX, textY, if (isSelected) -1 else Color(200, 200, 200).rgb)
@@ -92,7 +88,6 @@ class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
         val totalTabsWidth = categories.size * tabWidth + (categories.size - 1) * tabSpacing
         var tabX = centerX - totalTabsWidth / 2
 
-        // 1. 先添加选项卡，确保它们在 children 列表的前面，优先接收点击事件
         categories.forEach { category ->
             val tab = CategoryTab(category, tabX, 25, tabWidth, tabHeight)
             tabButtons.add(tab)
@@ -112,7 +107,6 @@ class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
         
         var currentY = 50 + scrollOffset.toInt()
 
-        // 2. 添加模块相关按钮
         modules.forEach { module ->
             val stateColor = if (module.state) "§a" else "§7"
             val bindingText = if (bindingModule == module) "§b[...]" else if (module.key != 0) " §8[${GLFW.glfwGetKeyName(module.key, 0)?.uppercase() ?: module.key}]" else ""
@@ -148,7 +142,6 @@ class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
     private fun getViewHeight(): Int = height - 90 // 与渲染区域 bgH 保持一致
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
-        // 只有在列表区域内才响应滚动
         val centerX = width / 2
         val listWidth = 320
         if (mouseX < centerX - listWidth / 2 || mouseX > centerX + listWidth / 2 || mouseY < 45 || mouseY > height - 45) {
@@ -176,15 +169,13 @@ class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
         val bgW = listWidth
         val bgY = 45
         val bgH = height - 90
-        
-        // 1. 优先检查选项卡点击
+
         for (tab in tabButtons) {
             if (tab.isMouseOver(mouseEvent.x, mouseEvent.y)) {
                 return tab.mouseClicked(mouseEvent, bl)
             }
         }
 
-        // 2. 检查滚动条点击
         val scrollbarX = bgX + bgW - 8
         val contentHeight = getContentHeight()
         val viewHeight = getViewHeight()
@@ -195,13 +186,10 @@ class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
             return true
         }
 
-        // 3. 检查模块列表区域内的点击
-        // 如果点击位置不在裁剪区域内，直接拦截，不向下传递给模块按钮
         if (mouseEvent.x < bgX || mouseEvent.x > bgX + bgW || mouseEvent.y < bgY || mouseEvent.y > bgY + bgH) {
             return false
         }
 
-        // 处理中键绑定逻辑
         val modules = ModuleManager.getModulesByCategory(selectedCategory)
         val startX = centerX - 300 / 2
         val toggleWidth = 40
@@ -276,50 +264,36 @@ class ClickGUIScreen : Screen(I18n.component("lightfalling.gui.clickgui")) {
         val bgY = 45
         val bgW = listWidth
         val bgH = height - 90
-        
-        // 1. 渲染模块列表容器背景
+
         guiGraphics.fill(bgX, bgY, bgX + bgW, bgY + bgH, 0xAA000000.toInt())
-        
-        // 2. 绘制边框 (支持选中选项卡处的自动断开融合)
+
         val borderColor = 0xFF555555.toInt()
         val selectedTab = tabButtons.find { it.category == selectedCategory }
-        
-//        if (selectedTab != null) {
-        // 顶部边框 - 分段绘制以避开选中的选项卡
+
         if (selectedTab!!.x > bgX) {
             guiGraphics.fill(bgX - 1, bgY - 1, selectedTab.x, bgY, borderColor)
         }
         if (selectedTab.x + selectedTab.width < bgX + bgW) {
             guiGraphics.fill(selectedTab.x + selectedTab.width, bgY - 1, bgX + bgW + 1, bgY, borderColor)
         }
-//        } else {
-//            guiGraphics.fill(bgX - 1, bgY - 1, bgX + bgW + 1, bgY, borderColor)
-//        }
-//
-        // 绘制左、右、底部的边框
         guiGraphics.fill(bgX - 1, bgY, bgX, bgY + bgH, borderColor) // 左
         guiGraphics.fill(bgX + bgW, bgY, bgX + bgW + 1, bgY + bgH, borderColor) // 右
-        guiGraphics.fill(bgX - 1, bgY + bgH, bgX + bgW + 1, bgY + bgH + 1, borderColor) // 下
 
-        // 3. 渲染选项卡 (覆盖在列表顶部边框上)
         tabButtons.forEach { it.render(guiGraphics, mouseX, mouseY, partialTick) }
-        
-        // 3. 绘制滚动条
+
         val contentHeight = getContentHeight()
         val viewHeight = getViewHeight()
         if (contentHeight > viewHeight) {
             val scrollbarX = bgX + bgW - 8
             val scrollbarHeight = max(20.0, (viewHeight.toDouble() / contentHeight) * viewHeight).toInt()
-            val scrollbarY = bgY + ((-scrollOffset / (contentHeight - viewHeight)) * (viewHeight - scrollbarHeight)).toInt()
-            
-            guiGraphics.fill(scrollbarX, bgY + 2, scrollbarX + 6, bgY + bgH - 2, 0x30FFFFFF.toInt())
+            val scrollbarY =
+                bgY + ((-scrollOffset / (contentHeight - viewHeight)) * (viewHeight - scrollbarHeight)).toInt()
+
+            guiGraphics.fill(scrollbarX, bgY + 2, scrollbarX + 6, bgY + bgH - 2, 0x30FFFFFF)
             guiGraphics.fill(scrollbarX, scrollbarY, scrollbarX + 6, scrollbarY + scrollbarHeight, 0x80FFFFFF.toInt())
         }
-        
-        // 4. 裁剪并渲染模块列表
         guiGraphics.enableScissor(bgX, bgY, bgX + bgW, bgY + bgH)
         children().forEach {
-            // 只渲染模块相关的按钮（即不在 tabButtons 中的按钮）
             if (it is Button) {
                 it.render(guiGraphics, mouseX, mouseY, partialTick)
             }

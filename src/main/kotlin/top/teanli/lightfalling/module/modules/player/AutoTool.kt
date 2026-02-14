@@ -69,14 +69,14 @@ class AutoTool : Module(
     private fun findBestToolForEntity(target: LivingEntity): Int {
         val player = mc.player ?: return -1
         
-        var bestDamage = getAttackDamage(player.mainHandItem, target)
+        var bestDamage = getAttackDamage(player.mainHandItem)
         var bestSlot = -1
 
         for (i in 0..8) {
             val stack = player.inventory.getItem(i)
             if (stack.isEmpty) continue
             
-            val damage = getAttackDamage(stack, target)
+            val damage = getAttackDamage(stack)
             if (damage > bestDamage) {
                 bestDamage = damage
                 bestSlot = i
@@ -85,7 +85,7 @@ class AutoTool : Module(
         return bestSlot
     }
 
-    private fun getAttackDamage(stack: ItemStack, target: LivingEntity): Float {
+    private fun getAttackDamage(stack: ItemStack): Float {
         // Simplified damage check for tool switching in 1.21.1
         // We look at the base attack damage attribute if present
         return stack.item.components().get(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS)

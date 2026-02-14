@@ -24,6 +24,7 @@ class CropGrowthIndicator : Module(
     private val showPercentage = checkbox("showpercentage", true)
 
     private val onRender3D = listen<Render3DEvent> { event ->
+
         if (!show3D.value) return@listen
         
         val player = mc.player ?: return@listen

@@ -6,6 +6,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.Vec3
 
 /**
  * Utility object for entity-related operations
@@ -60,14 +61,9 @@ object EntityTool {
      */
     fun canSeeEntity(player: Player, entity: Entity): Boolean {
         val level = mc.level ?: return false
-        
-        // Get eye position of player
         val eyePos = player.getEyePosition(1.0f)
-        
-        // Get center position of entity (middle of bounding box)
         val entityPos = entity.position().add(0.0, entity.bbHeight / 2.0, 0.0)
         
-        // Perform ray trace from player eye to entity center
         val hitResult = level.clip(
             ClipContext(
                 eyePos,
@@ -78,8 +74,6 @@ object EntityTool {
             )
         )
         
-        // If ray trace hit type is MISS, entity is visible
-        // If it hit a block, check if the hit position is beyond the entity
         return hitResult.type == HitResult.Type.MISS ||
                hitResult.location.distanceTo(eyePos) >= entityPos.distanceTo(eyePos)
     }
@@ -87,10 +81,11 @@ object EntityTool {
     /**
      * Gets entities within range of a position
      */
-    fun getEntitiesInRange(centerPos: net.minecraft.world.phys.Vec3, range: Double): List<Entity> {
+    fun getEntitiesInRange(centerPos: Vec3, range: Double): List<Entity> {
         val level = mc.level ?: return emptyList()
         return level.entitiesForRendering().filter { entity ->
             entity.position().distanceTo(centerPos) <= range
         }
     }
 }
+

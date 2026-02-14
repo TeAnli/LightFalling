@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.Tooltip
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
@@ -16,7 +17,7 @@ class SettingsButton(
     y: Int,
     width: Int,
     height: Int,
-    private val parentScreen: net.minecraft.client.gui.screens.Screen
+    private val parentScreen: Screen
 ) : Button(x, y, width, height, Component.empty(), { _ ->
     Minecraft.getInstance().setScreen(ModuleSettingsScreen(module, parentScreen))
 }, DEFAULT_NARRATION) {

@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.protocol.Packet
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import top.teanli.lightfalling.event.Event
 
 /**
@@ -49,13 +48,6 @@ class Render2DEvent(
 ) : Event()
 
 /**
- * Event posted during entity rendering.
- */
-class RenderEntityEvent(
-    val poseStack: PoseStack
-) : Event()
-
-/**
  * Event posted when the player attacks an entity.
  */
 class AttackEvent(val target: Entity) : Event()
@@ -64,11 +56,6 @@ class AttackEvent(val target: Entity) : Event()
  * Event posted when the player starts mining a block.
  */
 class ClickBlockEvent(val pos: BlockPos, val direction: Direction) : Event()
-
-/**
- * Event posted when an entity takes damage.
- */
-class EntityDamageEvent(val entity: LivingEntity, val amount: Float) : Event()
 
 /**
  * Event posted when a packet is sent or received.

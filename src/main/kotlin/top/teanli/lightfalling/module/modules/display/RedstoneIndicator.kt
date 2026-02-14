@@ -128,7 +128,7 @@ class RedstoneIndicator : Module(
             lines.add("" to Color.WHITE) // Empty line
             lines.add("Signal by Direction:" to Color.LIGHT_GRAY)
 
-            for (direction in Direction.values()) {
+            for (direction in Direction.entries) {
                 val neighborPos = pos.relative(direction)
                 val neighborSignal = level.getSignal(neighborPos, direction)
 

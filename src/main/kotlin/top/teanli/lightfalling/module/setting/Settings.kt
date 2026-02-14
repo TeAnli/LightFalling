@@ -1,7 +1,6 @@
 package top.teanli.lightfalling.module.setting
 
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
 import top.teanli.lightfalling.tool.I18n
 import java.awt.Color
 import java.util.function.Supplier

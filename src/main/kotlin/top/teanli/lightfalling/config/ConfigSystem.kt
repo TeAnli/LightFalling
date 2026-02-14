@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.FabricLoader
 import top.teanli.lightfalling.Lightfalling
 import top.teanli.lightfalling.module.ModuleManager
 import top.teanli.lightfalling.module.setting.*
+import java.awt.Color
 import java.io.File
 import java.nio.charset.StandardCharsets
 
@@ -97,7 +98,7 @@ object ConfigSystem {
                                     setting.value = mode
                                 }
                             }
-                            is ColorSetting -> setting.value = java.awt.Color(settingElement.asInt, true)
+                            is ColorSetting -> setting.value = Color(settingElement.asInt, true)
 
                         }
                     } catch (e: Exception) {

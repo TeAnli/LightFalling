@@ -50,7 +50,6 @@ class ColorPicker(
     }
 
     private fun drawSBPicker(guiGraphics: GuiGraphics, x: Int, y: Int, w: Int, h: Int) {
-        val baseColor = Color.getHSBColor(hue, 1f, 1f)
 
         guiGraphics.fill(x, y, x + w, y + h, 0xFF000000.toInt())
 
@@ -98,7 +97,6 @@ class ColorPicker(
 
     private fun updateValues(mouseX: Double, mouseY: Double) {
         val pickerWidth = width - 15
-        val hueWidth = 10
         val spacing = 5
 
         if (mouseX >= x + pickerWidth + spacing && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {

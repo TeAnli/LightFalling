@@ -1,17 +1,15 @@
 package top.teanli.lightfalling.ui.clickgui.components
 
-import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.client.gui.narration.NarratedElementType
 import net.minecraft.client.input.MouseButtonEvent
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import top.teanli.lightfalling.module.setting.BlockListSetting
+import top.teanli.lightfalling.tool.I18n
 import kotlin.math.max
 import kotlin.math.min
 
@@ -21,7 +19,7 @@ class BlockSelector(
     width: Int,
     height: Int,
     private val setting: BlockListSetting
-) : AbstractWidget(x, y, width, height, top.teanli.lightfalling.tool.I18n.component("lightfalling.blockselector.title")) {
+) : AbstractWidget(x, y, width, height, I18n.component("lightfalling.blockselector.title")) {
     
     private val mc = Minecraft.getInstance()
     private var scrollOffset = 0
@@ -54,7 +52,7 @@ class BlockSelector(
         guiGraphics.fill(x + width - 1, y, x + width, y + height, 0xFFFFFFFF.toInt())
         
         // Draw title
-        val titleText = top.teanli.lightfalling.tool.I18n.translate("lightfalling.blockselector.title")
+        val titleText = I18n.translate("lightfalling.blockselector.title")
         guiGraphics.drawString(mc.font, titleText, x + 5, y + 5, 0xFFFFFF)
         
         // Draw block grid
@@ -128,6 +126,6 @@ class BlockSelector(
     }
     
     override fun updateWidgetNarration(narrationElementOutput: NarrationElementOutput) {
-        narrationElementOutput.add(net.minecraft.client.gui.narration.NarratedElementType.TITLE, message)
+        narrationElementOutput.add(NarratedElementType.TITLE, message)
     }
 }

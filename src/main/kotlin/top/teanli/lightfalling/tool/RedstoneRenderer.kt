@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.ComparatorBlock
 import net.minecraft.world.level.block.DaylightDetectorBlock
 import net.minecraft.world.level.block.DispenserBlock
 import net.minecraft.world.level.block.DoorBlock
-import net.minecraft.world.level.block.DropperBlock
 import net.minecraft.world.level.block.FenceGateBlock
 import net.minecraft.world.level.block.HopperBlock
 import net.minecraft.world.level.block.LecternBlock
@@ -24,7 +23,6 @@ import net.minecraft.world.level.block.RedStoneOreBlock
 import net.minecraft.world.level.block.RedStoneWireBlock
 import net.minecraft.world.level.block.RedstoneLampBlock
 import net.minecraft.world.level.block.RedstoneTorchBlock
-import net.minecraft.world.level.block.RedstoneWallTorchBlock
 import net.minecraft.world.level.block.RepeaterBlock
 import net.minecraft.world.level.block.TargetBlock
 import net.minecraft.world.level.block.TrapDoorBlock
@@ -52,14 +50,7 @@ object RedstoneRenderer {
 
     fun isRedstoneBlock(block: Block): Boolean {
         return block is RedStoneWireBlock ||
-                block is RedstoneTorchBlock ||
-                block is RedstoneWallTorchBlock ||
-                block is RepeaterBlock ||
-                block is ComparatorBlock ||
-                block is RedstoneLampBlock ||
-                block is ObserverBlock ||
-                block is PistonBaseBlock ||
-                block is DispenserBlock || block is HopperBlock || block is DoorBlock || block is TrapDoorBlock || block is FenceGateBlock || block is NoteBlock || block is RedStoneOreBlock || block is LeverBlock || block is ButtonBlock || block is PressurePlateBlock || block is WeightedPressurePlateBlock || block is TripWireBlock || block is TripWireHookBlock || block is DaylightDetectorBlock || block is TargetBlock || block is LightningRodBlock || block is LecternBlock || block is BellBlock
+            block is RedstoneTorchBlock || block is RepeaterBlock || block is ComparatorBlock || block is RedstoneLampBlock || block is ObserverBlock || block is PistonBaseBlock || block is DispenserBlock || block is HopperBlock || block is DoorBlock || block is TrapDoorBlock || block is FenceGateBlock || block is NoteBlock || block is RedStoneOreBlock || block is LeverBlock || block is ButtonBlock || block is PressurePlateBlock || block is WeightedPressurePlateBlock || block is TripWireBlock || block is TripWireHookBlock || block is DaylightDetectorBlock || block is TargetBlock || block is LightningRodBlock || block is LecternBlock || block is BellBlock
     }
 
     fun getRedstoneInfo(blockState: BlockState, pos: BlockPos): RedstoneInfo? {
@@ -98,7 +89,6 @@ object RedstoneRenderer {
             pos.z + 0.5,
             text,
             color,
-            distanceScale = true
         )
     }
 }

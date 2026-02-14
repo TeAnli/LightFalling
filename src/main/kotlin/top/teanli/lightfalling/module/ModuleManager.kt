@@ -1,10 +1,8 @@
 package top.teanli.lightfalling.module
 
 import net.minecraft.client.Minecraft
-import org.apache.logging.log4j.LogManager
 import org.lwjgl.glfw.GLFW
 import top.teanli.lightfalling.Lightfalling
-import top.teanli.lightfalling.config.ConfigSystem
 import top.teanli.lightfalling.event.Event
 import top.teanli.lightfalling.event.EventListener
 import top.teanli.lightfalling.event.EventManager
