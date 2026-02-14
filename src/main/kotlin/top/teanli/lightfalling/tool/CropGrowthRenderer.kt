@@ -78,8 +78,7 @@ object CropGrowthRenderer {
             pos.y + 0.8,
             pos.z + 0.5,
             text,
-            color,
-            distanceScale = true
+            color
         )
     }
 }

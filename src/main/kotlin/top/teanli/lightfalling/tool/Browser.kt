@@ -2,8 +2,11 @@ package top.teanli.lightfalling.tool
 
 import net.ccbluex.liquidbounce.mcef.MCEF
 import java.io.IOException
+import kotlinx.coroutines.*
 
 object Browser {
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    
     fun download(){
         try {
             val resourceManager = MCEF.INSTANCE.newResourceManager()
@@ -13,15 +16,13 @@ object Browser {
             }
 
             if (resourceManager.requiresDownload()) {
-                Multithreading.runAsync {
+                scope.launch {
                     try {
                         resourceManager.downloadJcef()
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
                 }
-
-
             }
         } catch (e: IOException) {
             e.printStackTrace()

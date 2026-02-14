@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.Vec3
-import top.teanli.lightfalling.event.impl.EntityDamageEvent
 import top.teanli.lightfalling.event.impl.Render3DEvent
 import top.teanli.lightfalling.event.impl.TickEvent
 import top.teanli.lightfalling.event.listen
@@ -32,6 +31,7 @@ class DamageIndicator : Module(
 
     private val damages = mutableListOf<Damage>()
     private val lastHealth = mutableMapOf<Int, Float>()
+    
     private fun addDamage(entity: Entity, damage: Float) {
         // Initial position above the entity's head in world coordinates
         val pos = entity.position().add(0.0, (entity as? LivingEntity)?.bbHeight?.toDouble() ?: 1.0, 0.0)
